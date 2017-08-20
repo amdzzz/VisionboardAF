@@ -4,9 +4,11 @@ import FlickrImage from "../components/FlickrImage";
 import {DropdownButton, MenuItem} from 'react-bootstrap'
 import reactCSS from 'reactcss'
 import { SketchPicker } from 'react-color';
+var ReactGridLayout = require('react-grid-layout');
 
 
 export default class Demo extends React.Component {
+
 
 constructor(){
   super();
@@ -38,6 +40,12 @@ constructor(){
     textBGColor:{}
  };
 
+}
+
+onLayoutChange(layout){
+  console.log("on layout change");
+  console.log("layout: " + layout);
+  console.log("f" + JSON.stringify(layout));
 }
 
  handleClick = () => {
@@ -93,7 +101,8 @@ constructor(){
   }
   render() {
     console.log("demo");
-console.log("js" + JSON.stringify(this.state.secondaryTextStyle));
+     var layout = [{"w":3.2,"h":8,"x":0,"y":2.25,"i":"b","moved":false,"static":false,"isResizable":false},{"w":4,"h":1.5,"x":4,"y":0,"i":"c","moved":false,"static":false,"isResizable":false},{"w":4,"h":2.25,"x":0,"y":10.25,"i":"d","moved":false,"static":false,"isResizable":false},{"w":3.2,"h":8,"x":8,"y":0,"i":"h","moved":false,"static":false,"isResizable":false},{"w":4,"h":2.25,"x":5,"y":9.5,"i":"f","moved":false,"static":false,"isResizable":false},{"w":2,"h":2.25,"x":0,"y":0,"i":"k","moved":false,"static":false,"isResizable":false},{"w":4,"h":1.25,"x":6,"y":11.75,"i":"g","moved":false,"static":false,"isResizable":false},{"w":3.2,"h":8,"x":5,"y":13,"i":"i","moved":false,"static":false,"isResizable":false},{"w":3.2,"h":8,"x":4,"y":1.5,"i":"j","moved":false,"static":false,"isResizable":false},{"w":3.2,"h":8,"x":1,"y":12.5,"i":"p","moved":false,"static":false,"isResizable":false}];
+      console.log("js" + JSON.stringify(this.state.secondaryTextStyle));
     const styles = reactCSS({
       'default': {
         color: {
@@ -189,10 +198,17 @@ console.log("js" + JSON.stringify(this.state.secondaryTextStyle));
             <h1>Dreamboard Image Options</h1>
 
               <div class="col-md-12">
-            <FlickrImage  imgClass={this.state.demoImgClass} primaryTextStyle={this.state.primaryTextStyle} secondaryTextStyle={this.state.secondaryTextStyle} key="3837389579"  title="Black cat no.67" id="3837389579" secret="d8eea2e9e0" farm="3" server="2580"/>           
-            <FlickrImage  imgClass={this.state.demoImgClass} primaryTextStyle={this.state.primaryTextStyle} secondaryTextStyle={this.state.secondaryTextStyle} primarykey="16298657569"  title="london" id="16298657569" secret="b606bae4fe" farm="8" server="7426"/>           
-            <FlickrImage  imgClass={this.state.demoImgClass} primaryTextStyle={this.state.primaryTextStyle} secondaryTextStyle={this.state.secondaryTextStyle} key="34728344012"  title="Schwifty Rickmobile" id="34728344012" secret="8f63a7154d" farm="5" server="4222"/>           
+                <div class="col-md-4">
+            <FlickrImage  imgClass={this.state.demoImgClass} primaryTextStyle={this.state.primaryTextStyle} secondaryTextStyle={this.state.secondaryTextStyle} key="3837389579"  title="Black cat no.67" subTitle="demo subtitle" id="3837389579" secret="d8eea2e9e0" farm="3" server="2580"/>           
+            </div>
+            <div class="col-md-4">
 
+            <FlickrImage  imgClass={this.state.demoImgClass} primaryTextStyle={this.state.primaryTextStyle} secondaryTextStyle={this.state.secondaryTextStyle} key="16298657569"  title="london" subTitle="demo subtitle" id="16298657569" secret="b606bae4fe" farm="8" server="7426"/>           
+            </div>
+            <div class="col-md-4">
+
+            <FlickrImage  imgClass={this.state.demoImgClass} primaryTextStyle={this.state.primaryTextStyle} secondaryTextStyle={this.state.secondaryTextStyle} key="34728344012"  title="Schwifty Rickmobile" subTitle="demo subtitle" id="34728344012" secret="8f63a7154d" farm="5" server="4222"/>           
+            </div>
               </div>
             <div class ="row">
 
@@ -305,6 +321,52 @@ console.log("js" + JSON.stringify(this.state.secondaryTextStyle));
             <ImageSearch authed={this.props.route.authed} user={this.props.route.user} ></ImageSearch>
             <hr></hr>
             <h1>Demo Dreamboard</h1>
+            <div style={{border:"6px solid white"}}>
+             <ReactGridLayout onLayoutChange={this.onLayoutChange} className="layout" layout={layout} cols={12} rowHeight={30} width={1200}>
+              <div  key={'b'}>
+                <FlickrImage  imgClass="effect-steve" key="34728344012"  title="Schwifty Rickmobile" subTitle="get a new Schwiftmobile" id="34728344012" secret="8f63a7154d" farm="5" server="4222"/>             
+              </div>
+              <div key={'c'}> 
+                <div style={{background: "white"}}>
+                  <a class="link link--kukuri"  data-letters="england">england</a>          
+                </div>
+              </div>
+              <div key={'d'}> 
+                <div style={{background: "red"}}>
+		        		<a class="link link--kumya"><span data-letters="schwifty">schwifty</span></a>
+                </div>
+              </div>
+              
+              <div  key={'h'}>
+                <FlickrImage  imgClass="effect-dexter"  key="6257398888"  title="Workout" subTitle="workout 3 times a week" id="6257398888" secret="f710a47cc7" farm="7" server="6216"/>             
+              </div>
+               <div key={'f'}> 
+                <div  style={{background: "black"}}>
+				        <a class="link link--nukun" >ki<span>d</span>nap</a>       
+                </div>
+              </div>
+               <div key={'k'}> 
+                <div style={{background: "red"}} >
+				        <a  class="link link--nukun" >g<span>e</span>t</a>       
+                </div>
+              </div>
+                <div key={'g'}> 
+                <div  style={{background: "#000035"}}>
+			          	<a class="link link--ilin"><span>Jo</span><span>hn</span></a>
+                </div>
+              </div>
+                <div  key={'i'}>
+                <FlickrImage   imgClass="effect-zoe" key="3837389579"  title="Black cat no.67" subTitle=" aka: John Connor" id="3837389579" secret="d8eea2e9e0" farm="3" server="2580"/>             
+              </div>
+              
+              <div  key={'j'}>
+                <FlickrImage  imgClass="effect-sadie"key="16298657569"  title="london" subTitle="visit london" id="16298657569" secret="b606bae4fe" farm="8" server="7426"/>             
+              </div>
+                <div  key={'p'}>
+                <FlickrImage  imgClass="effect-sadie"key="35362641780"  title="Paint" subTitle="learn to paint" id="35362641780" secret="f3c1867e95" farm="5" server="4237"/>             
+              </div>
+             </ReactGridLayout>
+             </div>
             <hr></hr>
             
       </div>

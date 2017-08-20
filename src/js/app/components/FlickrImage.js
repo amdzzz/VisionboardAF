@@ -40,21 +40,20 @@ imgSelect(data)
     const { server } = this.props;    
     const { id } = this.props;
     const { secret } = this.props;
+    const { subTitle } = this.props;
 
 
     return (
-      <div class="col-md-4">
 				<div class="grid">
 					<figure class={this.props.imgClass}>
 						<img class="img-result" src={'https://farm'+farm+'.staticflickr.com/'+server+'/'+id+'_'+secret+'_'+'c.jpg'} alt={title}/>
 						<figcaption>
 							<h2 style={this.props.primaryTextStyle} class="hvision">{title}</h2>
-							<p style={this.props.secondaryTextStyle}>  Add to your vision <i class="fa fa-check font25" aria-hidden="true"></i></p>
+							<p style={this.props.secondaryTextStyle}> {subTitle}</p>
 							<a onClick={function(e){this.imgSelect({title,farm,server,id,secret}); e.preventDefault();}.bind(this)}></a>
 						</figcaption>			
 					</figure>
 				</div>
-      </div>
     );
   }
 }

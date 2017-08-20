@@ -23,7 +23,6 @@
 .grid {
 	position: relative;
 	margin: 0 auto;
-	padding: 1em 0 4em;
 	max-width: 1000px;
 	list-style: none;
 	text-align: center;
@@ -1029,7 +1028,7 @@ figure.effect-zoe:hover p.icon-links a:focus {
 
 figure.effect-zoe p.description {
 	position: absolute;
-	bottom: 8em;
+	bottom: 5em;
 	padding: 2em;
 	color: #fff;
 	text-transform: none;
@@ -3508,7 +3507,6 @@ figure.effect-duke:hover p {
 	.grid figure {
 		display: inline-block;
 		float: none;
-		margin: 10px auto;
 		width: 100%;
 	}
 }
@@ -3731,7 +3729,7 @@ figure.effect-duke:hover p {
 	outline: none;
 	text-decoration: none;
 	position: relative;
-	font-size: 8em;
+	font-size: 5em;
 	line-height: 1;
 	color: #9e9ba4;
 	display: inline-block;
@@ -3995,7 +3993,7 @@ figure.effect-duke:hover p {
 /* Kumya */
 .link--kumya {
 	font-family: 'Syncopate', sans-serif;
-	font-size: 6.5em;
+	font-size: 5em;
 	overflow: hidden;
 	padding: 10px 10px 0;
 	line-height: 1;

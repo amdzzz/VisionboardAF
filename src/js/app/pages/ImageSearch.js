@@ -70,7 +70,7 @@ export default class ImageSearch extends React.Component {
 
   render() {
     
- const DisplayPhotos = this.state.displayPhotos.map((photo, i) => <FlickrImage  imgClass="effect-bubba" key={photo.id} onImageSelected={this.onImageSelected.bind(this)} title={photo.title} id={photo.id} secret={photo.secret} farm={photo.farm} server={photo.server}/> );        
+ const DisplayPhotos = this.state.displayPhotos.map((photo, i) =><div class="col-md-4"> <FlickrImage  imgClass="effect-bubba" key={photo.id} onImageSelected={this.onImageSelected.bind(this)} title={photo.title} subTitle="Add this image" id={photo.id} secret={photo.secret} farm={photo.farm} server={photo.server}/> </div>);        
     if(DisplayPhotos.length<0){
         return(
             <div>
