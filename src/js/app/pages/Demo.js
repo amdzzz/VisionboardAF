@@ -26,8 +26,16 @@ constructor(){
       b: '19',
       a: '1',
     },
+     displayColorPicker3: false,
+    color3: {
+      r: '241',
+      g: '112',
+      b: '19',
+      a: '1',
+    },
     primaryTextStyle:{},
-    secondaryTextStyle:{}
+    secondaryTextStyle:{},
+    textBGColor:{}
  };
 
 }
@@ -60,6 +68,21 @@ constructor(){
       console.log("change secondary color: " + color2.hex);
     const secondaryTextStyle = {color: color2.hex};
     this.setState({secondaryTextStyle});
+  };
+
+   handleClick3 = () => {
+    this.setState({ displayColorPicker3: !this.state.displayColorPicker3 })
+  };
+
+  handleClose3 = () => {
+    this.setState({ displayColorPicker3: false })
+  };
+
+  handleChange3 = (color3) => {
+    this.setState({ color3: color3.rgb });
+      console.log("change bg color: " + color3.hex);
+    const textBGColor = {background: color3.hex};
+    this.setState({textBGColor});
   };
 
   changeImageEffect(eventKey){
@@ -131,6 +154,36 @@ console.log("js" + JSON.stringify(this.state.secondaryTextStyle));
       },
     });
 
+    const styles3 = reactCSS({
+      'default': {
+        color3: {
+          width: '36px',
+          height: '14px',
+          borderRadius: '2px',
+          background: `rgba(${ this.state.color3.r }, ${ this.state.color3.g }, ${ this.state.color3.b }, ${ this.state.color3.a })`,
+        },
+        swatch3: {
+          padding: '5px',
+          background: '#fff',
+          borderRadius: '1px',
+          boxShadow: '0 0 0 1px rgba(0,0,0,.1)',
+          display: 'inline-block',
+          cursor: 'pointer',
+        },
+        popover3: {
+          position: 'absolute',
+          zIndex: '2',
+        },
+        cover3: {
+          position: 'fixed',
+          top: '0px',
+          right: '0px',
+          bottom: '0px',
+          left: '0px',
+        },
+      },
+    });
+
     return (
         <div class="container">
             <h1>Dreamboard Image Options</h1>
@@ -140,10 +193,10 @@ console.log("js" + JSON.stringify(this.state.secondaryTextStyle));
             <FlickrImage  imgClass={this.state.demoImgClass} primaryTextStyle={this.state.primaryTextStyle} secondaryTextStyle={this.state.secondaryTextStyle} primarykey="16298657569"  title="london" id="16298657569" secret="b606bae4fe" farm="8" server="7426"/>           
             <FlickrImage  imgClass={this.state.demoImgClass} primaryTextStyle={this.state.primaryTextStyle} secondaryTextStyle={this.state.secondaryTextStyle} key="34728344012"  title="Schwifty Rickmobile" id="34728344012" secret="8f63a7154d" farm="5" server="4222"/>           
 
-            </div>
+              </div>
             <div class ="row">
 
-            <div class="col-md-4">
+            <div class="col-md-4" style={{marginBottom:"15px"}}>
             <DropdownButton  bsStyle="primary" title="Image Effect" id="bg-nested-dropdown">
               <MenuItem onSelect={this.changeImageEffect.bind(this)}  eventKey="effect-apollo">Apollo</MenuItem>
               
@@ -191,7 +244,6 @@ console.log("js" + JSON.stringify(this.state.secondaryTextStyle));
            
             </DropdownButton>
               </div>
-               
                 <div class="col-md-4">
                   <div style={ styles.swatch } onClick={ this.handleClick }>
                     <div style={ styles.color } />
@@ -215,15 +267,46 @@ console.log("js" + JSON.stringify(this.state.secondaryTextStyle));
                 </div>
 
                 </div>
-              
-    
+            <div class="row">
+            <hr></hr>
 
-           
+            <h1>Text Options</h1>
+              <div class="col-md-6 color-8" style={this.state.textBGColor}>
+                <a class="link link--kukuri"  data-letters="Kukuri">Kukuri</a>          
+              </div>
+              <div class="col-md-6  color-3"style={this.state.textBGColor}>
+				        <a class="link link--nukun" >Nu<span>k</span>un</a>       
+              </div>
+              <div class="col-md-6 color-4"style={this.state.textBGColor}>
+		        		<a class="link link--kumya"><span data-letters="Kumya">Kumya</span></a>
+              </div>
+              <div class="col-md-6 color-9" style={this.state.textBGColor}>
+			        	<a class="link link--ilin"><span>Il</span><span>in</span></a>
+              </div>
+              <div class="clearfix"></div>
+              <div class="col-md-4">
+                </div>
+               <div class="col-md-4"  style={{marginTop:"15px"}}>
+                  <div style={ styles3.swatch3 } onClick={ this.handleClick3 }>
+                    <div style={ styles3.color3 } />
+                  </div>
+                  { this.state.displayColorPicker3 ? <div style={ styles3.popover3 }>
+                    <div style={ styles3.cover3 } onClick={ this.handleClose3 }/>
+                    <SketchPicker color={ this.state.color3 } onChange={ this.handleChange3 } />
+                  </div> : null }
+                  <p class="demo-title">Text Background Color</p>
+                </div>
+                 <div class="col-md-4">
+                </div>
+            </div>
+                                                           <hr></hr>
+
             <h1>Image Search</h1>
             <ImageSearch authed={this.props.route.authed} user={this.props.route.user} ></ImageSearch>
             <hr></hr>
             <h1>Demo Dreamboard</h1>
             <hr></hr>
+            
       </div>
     );
   }
