@@ -1,7 +1,7 @@
 import React from "react";
 import { IndexLink, Link } from "react-router";
 import { Modal, Tooltip, Popover, Button, OverlayTrigger,DropdownButton, MenuItem } from  'react-bootstrap';
-
+import NinaButton from '../NinaButton';
 
 
 export default class Nav extends React.Component {
@@ -9,6 +9,7 @@ export default class Nav extends React.Component {
     super()
     this.state = {
       collapsed: true,
+      showModal: false
     };    
 
   }
@@ -28,10 +29,6 @@ export default class Nav extends React.Component {
   float:"right"
 }
 
-  getInitialState() {
-    return { showModal: false };
-  }
-
   close() {
     this.setState({ showModal: false });
   }
@@ -44,10 +41,12 @@ export default class Nav extends React.Component {
     console.log("nav render authed: " + this.props.authed);
     const { location } = this.props;
     const { collapsed } = this.state;
-    const featuredClass = location.pathname === "/" ? "active" : "";
+    const { signIn } = this.props;
     const demoClass = location.pathname.match(/^\/demo/) ? "active" : "";
     const aboutClass = location.pathname.match(/^\/about/) ? "active" : "";
     const contactClass = location.pathname.match(/^\/contact/) ? "active" : "";
+    const featuredClass = (demoClass !== "active" && aboutClass !== "active" && contactClass!=="active") ? "active" : "";
+
     const navClass = collapsed ? "collapse" : "";
     //userInfo
     var photoURL = "";
@@ -64,18 +63,19 @@ export default class Nav extends React.Component {
     if (authed) {
       loginBar =<section style={this.loginStyle} >
         <img class="img-login-circle" src={photoURL}></img>
-        <DropdownButton  bsStyle="primary" title={userName} id="bg-nested-dropdown">
+        <DropdownButton  bsStyle="danger" title={userName} id="bg-nested-dropdown">
               <MenuItem onSelect={this.open.bind(this)}  eventKey="">Sign Out</MenuItem>
-              <MenuItem  >Settings</MenuItem>
         </DropdownButton>
        </section>;
     } else {
-      loginBar =  <button
-                    style={this.loginStyle}
-                    class="btn btn-primary pull-right rightt"
-                    onClick={this.props.signIn}>
-                    <i class="fa fa-google" aria-hidden="true"></i>    Sign In
-                  </button>;
+
+      loginBar =  <div  style={this.loginStyle}><NinaButton
+                    btnText="Google Login"
+                    btnHoverText="Login"
+                    logo="fa fa-google"
+                    btnClass="success"
+                    onClickFn={signIn.bind(this)} /></div>
+                    
     }
 
   const popover = (
@@ -90,8 +90,8 @@ export default class Nav extends React.Component {
     );
     return (
     
-      <div>
-      <nav class="navbar navbar-fixed-top" role="navigation">
+      <div style = {{marginBottom:"6em"}}>
+      <nav  class="navbar navbar-fixed-top" role="navigation">
         <div class="container">
           <div class="navbar-header">
             <button type="button" class="navbar-toggle" onClick={this.toggleCollapse.bind(this)} >
@@ -104,15 +104,13 @@ export default class Nav extends React.Component {
           <div class={"navbar-collapse " + navClass} id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
               <li class={featuredClass}>
-                <IndexLink to="/" onClick={this.toggleCollapse.bind(this)}>My Dreamboards</IndexLink>
+                <IndexLink to="/" onClick={this.toggleCollapse.bind(this)}>My Visionboards</IndexLink>
               </li>
               
                 <li class={aboutClass}>
                 <Link to="about" onClick={this.toggleCollapse.bind(this)}>About</Link>
               </li>
-              <li class={contactClass}>
-                <Link to="contact" onClick={this.toggleCollapse.bind(this)}>Contact</Link>
-              </li>
+
               <li class={demoClass}>
                 <Link to="demo" onClick={this.toggleCollapse.bind(this)}>Demo</Link>
               </li>
@@ -125,15 +123,13 @@ export default class Nav extends React.Component {
       </nav>
 
 <Modal show={this.state.showModal} onHide={this.close.bind(this)}>
-          <Modal.Header closeButton>
-            <Modal.Title><h3 class="black">Sign Out?</h3></Modal.Title>
-          </Modal.Header>
+ 
           <Modal.Body>
-            <p>Do you want to sign out?</p>
+            <p>Do you want to sign out? Any unsaved data will be LOST!</p>
             </Modal.Body>
           <Modal.Footer>
-            <Button onClick={this.signOut.bind(this)}>Sign Out</Button>
-            <Button onClick={this.close.bind(this)}>Close</Button>
+            <Button bsStyle="danger" onClick={this.signOut.bind(this)}>Sign Out</Button>
+            <Button bsStyle="secondary" onClick={this.close.bind(this)}>Close</Button>
           </Modal.Footer>
         </Modal>
 

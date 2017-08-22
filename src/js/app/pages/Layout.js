@@ -13,7 +13,6 @@ export default class Layout extends React.Component {
 
 
   render() {
-    console.log("this.props.test " + this.props.route.name);
     console.log("has stuff: " + JSON.stringify(this.props.route));
     const { location } = this.props;
     const containerStyle = {
@@ -30,13 +29,9 @@ export default class Layout extends React.Component {
 
         <div class="container" style={containerStyle}>
           
-          <div class="row">
-            <div class="col-lg-12">
              
               {this.props.children}
 
-            </div>
-          </div>
           <Footer/>
         </div>
       </div>

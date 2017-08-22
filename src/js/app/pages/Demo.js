@@ -58,7 +58,6 @@ onLayoutChange(layout){
 
   handleChange = (color) => {
     this.setState({ color: color.rgb })
-    console.log("change primary color: " + color.hex);
     const primaryTextStyle = {color: color.hex};
     this.setState({primaryTextStyle})
   };
@@ -73,7 +72,6 @@ onLayoutChange(layout){
 
   handleChange2 = (color2) => {
     this.setState({ color2: color2.rgb });
-      console.log("change secondary color: " + color2.hex);
     const secondaryTextStyle = {color: color2.hex};
     this.setState({secondaryTextStyle});
   };
@@ -88,21 +86,17 @@ onLayoutChange(layout){
 
   handleChange3 = (color3) => {
     this.setState({ color3: color3.rgb });
-      console.log("change bg color: " + color3.hex);
     const textBGColor = {background: color3.hex};
     this.setState({textBGColor});
   };
 
   changeImageEffect(eventKey){
-    console.log("chagne image effect");
     const demoImgClass = eventKey;
-    console.log("new class: " + demoImgClass);
     this.setState({demoImgClass});
   }
   render() {
     console.log("demo");
      var layout = [{"w":3.2,"h":8,"x":0,"y":2.25,"i":"b","moved":false,"static":false,"isResizable":false},{"w":4,"h":1.5,"x":4,"y":0,"i":"c","moved":false,"static":false,"isResizable":false},{"w":4,"h":2.25,"x":0,"y":10.25,"i":"d","moved":false,"static":false,"isResizable":false},{"w":3.2,"h":8,"x":8,"y":0,"i":"h","moved":false,"static":false,"isResizable":false},{"w":4,"h":2.25,"x":5,"y":9.5,"i":"f","moved":false,"static":false,"isResizable":false},{"w":2,"h":2.25,"x":0,"y":0,"i":"k","moved":false,"static":false,"isResizable":false},{"w":4,"h":1.25,"x":6,"y":11.75,"i":"g","moved":false,"static":false,"isResizable":false},{"w":3.2,"h":8,"x":5,"y":13,"i":"i","moved":false,"static":false,"isResizable":false},{"w":3.2,"h":8,"x":4,"y":1.5,"i":"j","moved":false,"static":false,"isResizable":false},{"w":3.2,"h":8,"x":1,"y":12.5,"i":"p","moved":false,"static":false,"isResizable":false}];
-      console.log("js" + JSON.stringify(this.state.secondaryTextStyle));
     const styles = reactCSS({
       'default': {
         color: {
@@ -195,7 +189,10 @@ onLayoutChange(layout){
 
     return (
         <div class="container">
-            <h1>Dreamboard Image Options</h1>
+          <div class="row">
+          <h1 class="bsd-title">Demo</h1>
+          </div>
+            <h1 >Dreamboard Image Options</h1>
 
               <div class="col-md-12">
                 <div class="col-md-4">

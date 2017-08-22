@@ -4,7 +4,7 @@ import { Link } from "react-router";
 import * as firebase from "firebase";
 import { Router, Route, IndexRoute, hashHistory } from "react-router";
 import Layout from './pages/Layout';
-import Featured from './pages/Featured';
+import MyVisionBoards from './pages/MyVisionBoards';
 import Contact from './pages/contact';
 import About from './pages/about';
 import Demo from './pages/demo';
@@ -123,16 +123,13 @@ signOut(){
     const containerStyle = {
       marginTop: "60px"
     };
-    console.log("passing stuff: "+ JSON.stringify(this.state));
     const user = this.state.user;
     const authed = this.state.authed;
-    console.log("at render: " + JSON.stringify(user));
-    console.log("at redner auth: " + authed);
   
     return (
       <Router history={hashHistory}>
-    <Route path="/" name="testkk" component={Layout}  user={this.getUser.bind(this)} authed={this.getAuthed.bind(this)} signIn={this.googleSignIn.bind(this)} signOut={this.signOut.bind(this)}>
-      <IndexRoute component={Featured}></IndexRoute>
+    <Route path="/" component={Layout}  user={this.getUser.bind(this)} authed={this.getAuthed.bind(this)} signIn={this.googleSignIn.bind(this)} signOut={this.signOut.bind(this)}>
+      <IndexRoute component={MyVisionBoards}  user={this.getUser.bind(this)} authed={this.getAuthed.bind(this)}></IndexRoute>
       <Route path="about" name="about" component={About}></Route>
       <Route path="contact" name="contact" component={Contact} ></Route>
       <Route path="demo" name="demo" component={Demo}  user={this.getUser.bind(this)} authed={this.getAuthed.bind(this)} ></Route>

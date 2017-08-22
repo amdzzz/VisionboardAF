@@ -8,6 +8,8 @@ import Pagination from "../components/Pagination";
 
   import { ToastContainer, toast } from 'react-toastify';
 
+  import YokoInput from '../components/YokoInput';
+
 
 
 export default class ImageSearch extends React.Component {
@@ -18,8 +20,8 @@ export default class ImageSearch extends React.Component {
          this.state = {
             photos: [],
             displayPhotos:[],
-            dreamBoardId:"238skl"
-            // searchValue:"cats"
+            dreamBoardId:"238skl",
+            searchValue:""
             };
         this.onChangePage = this.onChangePage.bind(this);
 
@@ -69,14 +71,23 @@ export default class ImageSearch extends React.Component {
  }
 
   render() {
+
+    const photoSearchFilled = this.state.searchValue.length>0;
+    const photoSearchInputClass = photoSearchFilled? " input--filled":"";
+    console.log("input span class",photoSearchInputClass);
     
  const DisplayPhotos = this.state.displayPhotos.map((photo, i) =><div class="col-md-4"> <FlickrImage  imgClass="effect-bubba" key={photo.id} onImageSelected={this.onImageSelected.bind(this)} title={photo.title} subTitle="Add this image" id={photo.id} secret={photo.secret} farm={photo.farm} server={photo.server}/> </div>);        
     if(DisplayPhotos.length<0){
         return(
             <div>
                <h1>Search Here</h1>
-          <input class="searchInput" value={this.state.searchValue} onChange={this.handleChange.bind(this)} />
-        </div>
+                <span class={"input input--yoko"+ photoSearchInputClass}>
+                  <input class="input__field input__field--yoko" type="text" id="input-17" value={this.state.searchValue} onChange={this.handleChange.bind(this)} />
+                  <label class="input__label input__label--yoko" for="input-17">
+                    <span class="input__label-content input__label-content--yoko">Image Search</span>
+                  </label>
+                </span>       
+         </div>
         );
     }
     return (
@@ -90,14 +101,8 @@ export default class ImageSearch extends React.Component {
           closeOnClick
           pauseOnHover
         />
-          <div class="container">
-      
-        <span class="input input--minoru">
-					<input class="input__field input__field--yoko" type="text" id="input-17" value={this.state.searchValue} onChange={this.handleChange.bind(this)} />
-					<label class="input__label input__label--yoko" for="input-17">
-						<span class="input__label-content input__label-content--yoko">Image Search</span>
-					</label>
-        </span>
+        <div class="container">
+          <YokoInput value={this.state.searchValue} label={"Image Search"} onChange={this.handleChange.bind(this)} />
         </div>
         <div class="row">{DisplayPhotos}</div>
         <Pagination items={this.state.photos} onChangePage={this.onChangePage}/>
