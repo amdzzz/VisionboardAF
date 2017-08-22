@@ -5,6 +5,8 @@ import { Modal, Tooltip, Popover, Button, OverlayTrigger,DropdownButton, MenuIte
 import NinaButton from "../components/NinaButton";
 import YokoInput from "../components/YokoInput";
 import ColorPickerWrapper from '../components/ColorPickerWrapper';
+import VisionboardEditor from './VisionboardEditor'; 
+
 var ReactGridLayout = require('react-grid-layout');
 
 
@@ -15,8 +17,10 @@ export default class MyVisionboards extends React.Component {
     this.state={
       showCreateDreamboardModal: false, 
       createDreamboardTitle:"",
-      createDreamboardBGStyle:{background: "black"},
-      createDreamboardBorderStyle:{border:"6px solid white"}
+      createDreamboardBGStyle:{background: "#1e2021"},
+      createDreamboardBorderStyle:{border:"6px solid white"},
+      activeDreamboard:null,
+      demo:{}
     };
   }
 
@@ -51,6 +55,20 @@ export default class MyVisionboards extends React.Component {
 
   createDreamboard(){
     console.log("create dreamboard");
+    const title = this.state.createDreamboardTitle;
+    const backgroundStyle = this.state.createDreamboardBGStyle;
+    const borderStyle = this.state.createDreamboardBorderStyle;
+    const id = Date.now();
+    const demo ={id, title,backgroundStyle,borderStyle};
+    const activeDreamboard = id;
+    this.setState({activeDreamboard});
+    console.log("demo: ",demo);
+    this.closeCreateDreamboardModal();
+    this.showEditDreamboardPage(demo);
+  }
+
+  showEditDreamboardPage(demo){
+    this.setState({demo});
   }
 
   render() {
@@ -64,7 +82,7 @@ export default class MyVisionboards extends React.Component {
         <div>
           <div class="row">
             <div class="col-md-12">
-                <h1 class="bsd-title" >My Visionboards</h1>
+                <h1 class="wsg-title" >My Visionboards</h1>
       
                  <h1> Please log in with google to create or view your Visionboards.</h1>
                  <h1> See our Demo for more info on what you can create.</h1>
@@ -78,11 +96,12 @@ export default class MyVisionboards extends React.Component {
         </div>
       );
     }else{
+        const activeDreamboard = this.state.activeDreamboard!==null?<VisionboardEditor demo={this.state.demo}/>: <div></div>;
     return (
         <div>
           <div class="row">
             <div class="col-md-12">
-                <h1 class="bsd-title" >My Visionboards</h1>
+                <h1 class="wsg-title" >My Visionboards</h1>
             </div>
             <div class="col-md-4 pull-right">
                 
@@ -93,11 +112,16 @@ export default class MyVisionboards extends React.Component {
 
 
           </div>
+          <div class="row">
+            {activeDreamboard}
+            </div>
                                   <hr></hr>
 
          <Modal bsSize="large" show={this.state.showCreateDreamboardModal} onHide={this.closeCreateDreamboardModal.bind(this)}>
           <Modal.Header closeButton>
-            <h1 class="bsd-title">Create a Visionboard</h1>
+            <div class="text-center">
+            <h1 class="wsg-title">Create a Visionboard</h1>
+            </div>
           </Modal.Header>
           <Modal.Body>
             <div class="row">
@@ -106,8 +130,7 @@ export default class MyVisionboards extends React.Component {
            </div>
            <div class="col-md-6">
               <ColorPickerWrapper handleChange={this.handleChangecreateDreamBoardBG.bind(this)} color={{
-                r:'0',g:'0',b:'0',a:'1'
-              }}/>
+                r:'30',g:'32',b:'33',a:'1'}}/>
               <p class="demo-title">Background Color</p>
                <ColorPickerWrapper handleChange={this.handleChangecreateDreamBoardBorder.bind(this)} />
               <p class="demo-title">Border Color</p>
@@ -115,6 +138,7 @@ export default class MyVisionboards extends React.Component {
            </div>
            </div>
           <div  style={this.state.createDreamboardBorderStyle} >
+            <div style={this.state.createDreamboardBGStyle}>
             <ReactGridLayout   style={this.createDreamboardBGStyle}  cols={12} rowHeight={30} width={1200} layout={layout} >
              <div></div>
              <div></div>
@@ -126,10 +150,11 @@ export default class MyVisionboards extends React.Component {
              <div></div>
               </ReactGridLayout>
               </div>
+              </div>
             </Modal.Body>
           <Modal.Footer>
             <Button bsStyle="primary" onClick={this.createDreamboard.bind(this)}>Create</Button>
-            <Button bsStyle="secondary" onClick={this.closeCreateDreamboardModal.bind(this)}>Close</Button>
+            <Button  onClick={this.closeCreateDreamboardModal.bind(this)}>Close</Button>
           </Modal.Footer>
         </Modal>
 

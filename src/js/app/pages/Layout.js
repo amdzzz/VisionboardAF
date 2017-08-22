@@ -13,7 +13,6 @@ export default class Layout extends React.Component {
 
 
   render() {
-    console.log("has stuff: " + JSON.stringify(this.props.route));
     const { location } = this.props;
     const containerStyle = {
       marginTop: "60px"

@@ -90,7 +90,7 @@ export default class Nav extends React.Component {
     );
     return (
     
-      <div style = {{marginBottom:"6em"}}>
+      <div style = {{marginBottom:"7em"}}>
       <nav  class="navbar navbar-fixed-top" role="navigation">
         <div class="container">
           <div class="navbar-header">
@@ -129,7 +129,7 @@ export default class Nav extends React.Component {
             </Modal.Body>
           <Modal.Footer>
             <Button bsStyle="danger" onClick={this.signOut.bind(this)}>Sign Out</Button>
-            <Button bsStyle="secondary" onClick={this.close.bind(this)}>Close</Button>
+            <Button  onClick={this.close.bind(this)}>Close</Button>
           </Modal.Footer>
         </Modal>
 

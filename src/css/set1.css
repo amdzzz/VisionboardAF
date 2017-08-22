@@ -4748,17 +4748,22 @@ text-shadow: 1.5px 1.5px 6px #000000;	font-weight: bolder;
 	font-size: 4em;
 }.bsd-title{
 	font-family: 'blessed';
-	font-size: 4em;
+	font-size: 5.5em;
 }.sna-title{
 	font-family: 'scriptina';
 	font-size: 4em;
 }.wsg-title{
 	font-family: 'windsong';
-	font-size: 4em;
+	font-size: 5.5em;
 }
 
 .modal-content{
 	background: #1e2021;
 	border: 3px solid #FFFFFF;
+	color: #fff;
 
+}
+
+.grid_layout{
+	background: inherit;
 }

@@ -190,7 +190,7 @@ onLayoutChange(layout){
     return (
         <div class="container">
           <div class="row">
-          <h1 class="bsd-title">Demo</h1>
+          <h1 class="wsg-title">Demo</h1>
           </div>
             <h1 >Dreamboard Image Options</h1>
 
@@ -317,8 +317,8 @@ onLayoutChange(layout){
             <h1>Image Search</h1>
             <ImageSearch authed={this.props.route.authed} user={this.props.route.user} ></ImageSearch>
             <hr></hr>
-            <h1>Demo Dreamboard</h1>
-            <div style={{border:"6px solid white"}}>
+            <h1>Demo Vision Board</h1>
+            <div style={{border:"6px solid white",background:"#add8e6", width:"1200px"}}>
              <ReactGridLayout onLayoutChange={this.onLayoutChange} className="layout" layout={layout} cols={12} rowHeight={30} width={1200}>
               <div  key={'b'}>
                 <FlickrImage  imgClass="effect-steve" key="34728344012"  title="Schwifty Rickmobile" subTitle="get a new Schwiftmobile" id="34728344012" secret="8f63a7154d" farm="5" server="4222"/>             
@@ -339,7 +339,7 @@ onLayoutChange(layout){
               </div>
                <div key={'f'}> 
                 <div  style={{background: "black"}}>
-				        <a class="link link--nukun" >ki<span>d</span>nap</a>       
+				        <a class="link link--nukun" >ad<span>o</span>pt</a>       
                 </div>
               </div>
                <div key={'k'}> 
@@ -349,18 +349,18 @@ onLayoutChange(layout){
               </div>
                 <div key={'g'}> 
                 <div  style={{background: "#000035"}}>
-			          	<a class="link link--ilin"><span>Jo</span><span>hn</span></a>
+			          	<a class="link link--ilin"><span>A_</span><span> Cat</span></a>
                 </div>
               </div>
                 <div  key={'i'}>
-                <FlickrImage   imgClass="effect-zoe" key="3837389579"  title="Black cat no.67" subTitle=" aka: John Connor" id="3837389579" secret="d8eea2e9e0" farm="3" server="2580"/>             
+                <FlickrImage   imgClass="effect-zoe" key="3837389579"  title="Black cat no.67" subTitle=" :3" id="3837389579" secret="d8eea2e9e0" farm="3" server="2580"/>             
               </div>
               
               <div  key={'j'}>
                 <FlickrImage  imgClass="effect-sadie"key="16298657569"  title="london" subTitle="visit london" id="16298657569" secret="b606bae4fe" farm="8" server="7426"/>             
               </div>
                 <div  key={'p'}>
-                <FlickrImage  imgClass="effect-sadie"key="35362641780"  title="Paint" subTitle="learn to paint" id="35362641780" secret="f3c1867e95" farm="5" server="4237"/>             
+                <FlickrImage  imgClass="effect-sadie"key="35362641780"  title="Painting" subTitle="learn to paint" id="35362641780" secret="f3c1867e95" farm="5" server="4237"/>             
               </div>
              </ReactGridLayout>
              </div>
