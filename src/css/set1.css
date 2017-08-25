@@ -3751,10 +3751,11 @@ figure.effect-duke:hover p {
 	outline: none;
 	text-decoration: none;
 	position: relative;
-	font-size: 5em;
+	font-size: 4em;
 	line-height: 1;
 	color: #9e9ba4;
 	display: inline-block;
+	padding: 10px 10px 0;
 }
 
 /* Kukuri */
@@ -3764,6 +3765,7 @@ figure.effect-duke:hover p {
 	overflow: hidden;
 	line-height: 0.75;
 	color: #c5c2b8;
+	padding: 0px 0px 0;
 }
 
 .link--kukuri:hover {
@@ -4485,18 +4487,6 @@ figure.effect-duke:hover p {
 	.link--surinami { font-size: 3em; }
 }
 
-@media screen and (max-width: 42em) {
-	.link--takiri { font-size: 3.5em; }
-	.link--kukuri { font-size: 3.5em; }
-	.link--nukun { font-size: 3.5em; }
-	.link--kumya { font-size: 3em; }
-	.link--manko { font-size: 3.5em; }
-	.link--urpi { font-size: 5em; }
-	.link--mallki { font-size: 3.5em; }
-	.link--ilin { font-size: 5em; }
-	.link--asiri { -webkit-transform: scale3d(0.65,0.65,1); transform: scale3d(0.65,0.65,1); }
-	.link--yaku { font-size: 4em; }
-}
 
 
 
@@ -4687,7 +4677,7 @@ text-shadow: 1.5px 1.5px 6px #000000;	font-weight: bolder;
 
 
 .button--nina-primary:hover {
-	background-color: #90cec6;
+	background-color: rgb(187, 222, 240);
 	border: 3px solid #FFFFFF;
 }
 
@@ -4766,4 +4756,29 @@ text-shadow: 1.5px 1.5px 6px #000000;	font-weight: bolder;
 
 .grid_layout{
 	background: inherit;
+}
+
+.width2400{
+	width:2400px;
+}
+
+.width1200{
+	width:1200px;
+	border-radius: 3px;
+}
+
+.marginTop2em{
+	margin-top:2em;
+}
+.marginBottom2em{
+	margin-bottom:2em;
+}
+.marginRight2em{
+	margin-right: 2em;
+}
+
+@media only screen and (max-width: 890px) {
+    .form-responsive {
+        margin-left:40%;
+    }
 }

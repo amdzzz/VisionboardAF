@@ -2,6 +2,8 @@ import React from "react";
 
 import FlickrImage from "../components/FlickrImage";
 
+import VisionImage from "../components/VisionImage";
+
 import axios from 'axios';
 
 import Pagination from "../components/Pagination";
@@ -76,7 +78,7 @@ export default class ImageSearch extends React.Component {
     const photoSearchInputClass = photoSearchFilled? " input--filled":"";
     console.log("input span class",photoSearchInputClass);
     
- const DisplayPhotos = this.state.displayPhotos.map((photo, i) =><div class="col-md-4"> <FlickrImage  imgClass="effect-bubba" key={photo.id} onImageSelected={this.onImageSelected.bind(this)} title={photo.title} subTitle="Add this image" id={photo.id} secret={photo.secret} farm={photo.farm} server={photo.server}/> </div>);        
+ const DisplayPhotos = this.state.displayPhotos.map((photo, i) =><div class="col-md-4"> <VisionImage onPhotoDoubleClick={this.props.onPhotoDoubleClick}  imgClass="effect-apollo" key={photo.id} onImageSelected={this.onImageSelected.bind(this)} title={photo.title} subTitle="Add this image" src={'https://farm'+photo.farm+'.staticflickr.com/'+photo.server+'/'+photo.id+'_'+photo.secret+'_'+'c.jpg'}/> </div>);        
     if(DisplayPhotos.length<0){
         return(
             <div>
@@ -92,20 +94,25 @@ export default class ImageSearch extends React.Component {
     }
     return (
       <div>
-          <ToastContainer 
-          position="top-right"
-          type="default"
-          autoClose={5000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          pauseOnHover
-        />
-        <div class="container">
-          <YokoInput value={this.state.searchValue} label={"Image Search"} onChange={this.handleChange.bind(this)} />
+        <div class="row">
+          <div class="col-md-4">
+          </div>
+          <div class="col-md-4">
+            <YokoInput value={this.state.searchValue} label={"Image Search"} onChange={this.handleChange.bind(this)} />
+          </div>
+          <div class="col-md-4">
+          </div>
         </div>
         <div class="row">{DisplayPhotos}</div>
-        <Pagination items={this.state.photos} onChangePage={this.onChangePage}/>
+        <div class="row">
+          <div class="col-md-2">
+          </div>
+          <div class="col-md-8">
+          <Pagination items={this.state.photos} onChangePage={this.onChangePage}/>
+          </div>
+          <div class="col-md-2">
+          </div>
+        </div>
       </div>
     );
   }

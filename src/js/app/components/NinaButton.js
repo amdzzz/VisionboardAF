@@ -8,9 +8,11 @@ export default class NinaButton extends React.Component {
     const { logo } = this.props;
     const innerText = btnHoverText!==undefined? btnHoverText.split("").map((e,i) => <span>{e}</span>) : btnText.split("").map((e,i) => <span>{e}</span>);
     const { onClickFn }= this.props;
-  
-    const btnClassFull = "button button--nina button--border-thin button--round-s button--nina-" +btnClass; 
-    
+    const { hide } = this.props;
+    console.log("hide: ",hide);
+    const hideClass = hide===true?" hidden":"";
+    const btnClassFull = "button button--nina button--border-thin button--round-s button--nina-" +btnClass + hideClass; 
+ 
     if (logo!==undefined){
         const logoClass = logo + " pull-left";
         return (

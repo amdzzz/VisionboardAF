@@ -21,6 +21,7 @@
     "mobx": "^3.2.2",
     "mobx-react": "^4.2.2",
     "react": "^0.14.9",
+    "react-alert": "^2.2.0",
     "react-bootstrap": "^0.31.2",
     "react-color": "^2.13.4",
     "react-dom": "^0.14.9",

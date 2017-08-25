@@ -94,9 +94,22 @@ onLayoutChange(layout){
     const demoImgClass = eventKey;
     this.setState({demoImgClass});
   }
+
+  onPhotoDoubleClick(src){
+    console.log("on photo clicked ",src);
+  }
   render() {
     console.log("demo");
-     var layout = [{"w":3.2,"h":8,"x":0,"y":2.25,"i":"b","moved":false,"static":false,"isResizable":false},{"w":4,"h":1.5,"x":4,"y":0,"i":"c","moved":false,"static":false,"isResizable":false},{"w":4,"h":2.25,"x":0,"y":10.25,"i":"d","moved":false,"static":false,"isResizable":false},{"w":3.2,"h":8,"x":8,"y":0,"i":"h","moved":false,"static":false,"isResizable":false},{"w":4,"h":2.25,"x":5,"y":9.5,"i":"f","moved":false,"static":false,"isResizable":false},{"w":2,"h":2.25,"x":0,"y":0,"i":"k","moved":false,"static":false,"isResizable":false},{"w":4,"h":1.25,"x":6,"y":11.75,"i":"g","moved":false,"static":false,"isResizable":false},{"w":3.2,"h":8,"x":5,"y":13,"i":"i","moved":false,"static":false,"isResizable":false},{"w":3.2,"h":8,"x":4,"y":1.5,"i":"j","moved":false,"static":false,"isResizable":false},{"w":3.2,"h":8,"x":1,"y":12.5,"i":"p","moved":false,"static":false,"isResizable":false}];
+     var layout = [{"w":3,"h":8,"x":0,"y":2.25,"i":"b","moved":false,"static":false,"isResizable":false},
+     {"w":4,"h":1.5,"x":4,"y":0,"i":"c","moved":false,"static":false,"isResizable":false},
+     {"w":4,"h":2.25,"x":0,"y":10.25,"i":"d","moved":false,"static":false,"isResizable":false},
+     {"w":3,"h":8,"x":8,"y":0,"i":"h","moved":false,"static":false,"isResizable":false},
+     {"w":4,"h":2.25,"x":5,"y":9.5,"i":"f","moved":false,"static":false,"isResizable":false},
+     {"w":2,"h":2.25,"x":0,"y":0,"i":"k","moved":false,"static":false,"isResizable":false},
+     {"w":4,"h":1.25,"x":6,"y":11.75,"i":"g","moved":false,"static":false,"isResizable":false},
+     {"w":3,"h":8,"x":5,"y":13,"i":"i","moved":false,"static":false,"isResizable":false},
+     {"w":3,"h":8,"x":4,"y":1.5,"i":"j","moved":false,"static":false,"isResizable":false},
+     {"w":3,"h":8,"x":1,"y":12.5,"i":"p","moved":false,"static":false,"isResizable":false}];
     const styles = reactCSS({
       'default': {
         color: {
@@ -314,8 +327,8 @@ onLayoutChange(layout){
             </div>
                                                            <hr></hr>
 
-            <h1>Image Search</h1>
-            <ImageSearch authed={this.props.route.authed} user={this.props.route.user} ></ImageSearch>
+            <h1>Integrated Image Search</h1>
+            <ImageSearch onPhotoDoubleClick={this.onPhotoDoubleClick.bind(this)} authed={this.props.route.authed} user={this.props.route.user} ></ImageSearch>
             <hr></hr>
             <h1>Demo Vision Board</h1>
             <div style={{border:"6px solid white",background:"#add8e6", width:"1200px"}}>

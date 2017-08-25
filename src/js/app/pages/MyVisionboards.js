@@ -20,7 +20,7 @@ export default class MyVisionboards extends React.Component {
       createDreamboardBGStyle:{background: "#1e2021"},
       createDreamboardBorderStyle:{border:"6px solid white"},
       activeDreamboard:null,
-      demo:{}
+      demo:{},
     };
   }
 
@@ -96,7 +96,7 @@ export default class MyVisionboards extends React.Component {
         </div>
       );
     }else{
-        const activeDreamboard = this.state.activeDreamboard!==null?<VisionboardEditor demo={this.state.demo}/>: <div></div>;
+        const activeDreamboard = this.state.activeDreamboard!==null?<VisionboardEditor edit={true} demo={this.state.demo}/>: <div></div>;
     return (
         <div>
           <div class="row">
@@ -105,7 +105,7 @@ export default class MyVisionboards extends React.Component {
             </div>
             <div class="col-md-4 pull-right">
                 
-                    <NinaButton btnText="Create" 
+                    <NinaButton hide={this.state.activeDreamboard!==null} btnText="Create" 
                     btnClass="primary" 
                     onClickFn={onClickFn.bind(this)} />
             </div>
@@ -120,22 +120,26 @@ export default class MyVisionboards extends React.Component {
          <Modal bsSize="large" show={this.state.showCreateDreamboardModal} onHide={this.closeCreateDreamboardModal.bind(this)}>
           <Modal.Header closeButton>
             <div class="text-center">
-            <h1 class="wsg-title">Create a Visionboard</h1>
+               <h1 class="wsg-title">Create a Visionboard</h1>
             </div>
           </Modal.Header>
           <Modal.Body>
             <div class="row">
-            <div class="col-md-6">
-              <YokoInput label="Title" value={this.state.createDreamboardTitle} onChange={this.handleDreamboardTitleChange.bind(this)}/>
-           </div>
-           <div class="col-md-6">
-              <ColorPickerWrapper handleChange={this.handleChangecreateDreamBoardBG.bind(this)} color={{
-                r:'30',g:'32',b:'33',a:'1'}}/>
-              <p class="demo-title">Background Color</p>
-               <ColorPickerWrapper handleChange={this.handleChangecreateDreamBoardBorder.bind(this)} />
-              <p class="demo-title">Border Color</p>
+              <div class="col-md-1"></div>
+              <div class="col-md-6">
+                <YokoInput label="Title" value={this.state.createDreamboardTitle} onChange={this.handleDreamboardTitleChange.bind(this)}/>
+              </div>
+              <div class="col-md-2 marginTop2em form-responsive">
+                  <ColorPickerWrapper handleChange={this.handleChangecreateDreamBoardBG.bind(this)} color={{
+                    r:'30',g:'32',b:'33',a:'1'}}/>
+                  <p class="demo-title">Background Color</p>
+              </div>
+               <div class="col-md-2 marginTop2em form-responsive">
+                <ColorPickerWrapper handleChange={this.handleChangecreateDreamBoardBorder.bind(this)} />
+                <p class="demo-title">Border Color</p>
+              </div>
+          <div class="col-md-1"></div>
 
-           </div>
            </div>
           <div  style={this.state.createDreamboardBorderStyle} >
             <div style={this.state.createDreamboardBGStyle}>
