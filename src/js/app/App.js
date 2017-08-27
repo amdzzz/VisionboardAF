@@ -16,7 +16,6 @@ export default class App extends React.Component {
     super(props, context);
 
     this.state={
-      authed:false,
       user:null,
       token:null
     }
@@ -36,7 +35,6 @@ export default class App extends React.Component {
   }
 
   checkLoggedIn(){
-        console.log("check logged in");
     const token = localStorage.getItem("token");
   
     if(token !== null){
@@ -48,6 +46,7 @@ export default class App extends React.Component {
           var user = result;
          this.setAuthed(true);
          this.setUser(user);
+         console.log("user",user);
         }.bind(this)).catch(function(error) {
         // Handle Errors here.
         var errorCode = error.code;
@@ -96,6 +95,7 @@ export default class App extends React.Component {
     this.setUser(user);
     // ...
   }.bind(this)).catch(function(error) {
+    this.setAuthed(false);
     // Handle Errors here.
     var errorCode = error.code;
     var errorMessage = error.message;
@@ -114,7 +114,6 @@ signOut(){
   localStorage.setItem('token', null);
 
   firebase.auth().signOut();
-  console.log("signed out");
 }
 
   render() {
@@ -125,17 +124,20 @@ signOut(){
     };
     const user = this.state.user;
     const authed = this.state.authed;
-  
+    if(this.state.authed){
     return (
-      <Router history={hashHistory}>
-    <Route path="/" component={Layout}  user={this.getUser.bind(this)} authed={this.getAuthed.bind(this)} signIn={this.googleSignIn.bind(this)} signOut={this.signOut.bind(this)}>
-      <IndexRoute component={MyVisionBoards}  user={this.getUser.bind(this)} authed={this.getAuthed.bind(this)}></IndexRoute>
-      <Route path="about" name="about" component={About}></Route>
-      <Route path="contact" name="contact" component={Contact} ></Route>
-      <Route path="demo" name="demo" component={Demo}  user={this.getUser.bind(this)} authed={this.getAuthed.bind(this)} ></Route>
-    </Route>
-  </Router>
+          <Router history={hashHistory}>
+            <Route path="/" component={Layout}  user={this.getUser.bind(this)} authed={this.getAuthed.bind(this)} signIn={this.googleSignIn.bind(this)} signOut={this.signOut.bind(this)}>
+            <IndexRoute component={MyVisionBoards} firebase={firebase}  user={this.getUser.bind(this)} authed={this.getAuthed.bind(this)}></IndexRoute>
+            <Route path="about" name="about" component={About}></Route>
+            <Route path="contact" name="contact" component={Contact} ></Route>
+            <Route path="demo" name="demo" component={Demo}  user={this.getUser.bind(this)} authed={this.getAuthed.bind(this)} ></Route>
+        </Route>
+      </Router>
 
-    );
+        );
+    }else{
+      return(<div class="container"><img style={{marginTop:"2%",width:"500px",height:"500px"}} src="/img/source.gif" /></div>);
+    }
   }
 }

@@ -38,7 +38,6 @@ export default class Nav extends React.Component {
   }
 
   render() {
-    console.log("nav render authed: " + this.props.authed);
     const { location } = this.props;
     const { collapsed } = this.state;
     const { signIn } = this.props;

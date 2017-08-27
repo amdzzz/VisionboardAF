@@ -1,0 +1,37 @@
+Visionboard
+    -visionBoardId 
+    -title
+    -backgroundStyle
+    -borderStyle
+    -createdBy
+    -createdDate
+    -lastModifiedDate
+
+VisionText
+    -visionBoardId
+    -effect {'kumya' }
+    -text : element text
+    -backgorundColor : the backgroundColorStyle
+    -w: width
+    -h: height
+    -x: x position on layout
+    -y: y position on layout
+    -createdBy
+    -createdDate
+    -lastModifiedDate
+
+VisionPhoto
+    -visionBoardId
+    -effect {'effect-bubba' }
+    -primaryText : primary text
+    -secondaryText : secondaryText
+    -primaryTextStyle : 
+    -secondaryTextStyle : 
+    -srcUrl: src
+    -w: width
+    -h: height
+    -x: x position on layout
+    -y: y position on layout
+    -createdBy
+    -createdDate
+    -lastModifiedDate

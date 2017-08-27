@@ -7,6 +7,7 @@ import YokoInput from "../components/YokoInput";
 import ColorPickerWrapper from '../components/ColorPickerWrapper';
 import VisionboardEditor from './VisionboardEditor'; 
 
+
 var ReactGridLayout = require('react-grid-layout');
 
 
@@ -24,15 +25,25 @@ export default class MyVisionboards extends React.Component {
     };
   }
 
+  componentDidMount(){
+    console.log("did mount");
+    this.firebase=this.props.route.firebase;
+    console.log("test mvb",this.firebase);
+    this.visionboards = this.firebase.database().ref("/visionboards");
+    if(this.props.route.user())
+      this.visionboards.orderByChild("uid").equalTo(this.props.route.user().uid)
+      .on("child_added",(snapshot)=>{
+        console.log("dreamboard added:",snapshot.key);
+      });
+  }
+
 
   handleChangecreateDreamBoardBG = (color) => {
-    console.log("recievedColor ",color)
     const createDreamboardBGStyle = {background:color.hex};
     this.setState({createDreamboardBGStyle});
   };
 
   handleChangecreateDreamBoardBorder = (color) => {
-   console.log("recieved color ",color);
    const createDreamboardBorderStyle = {border:"6px solid "+color.hex};
    this.setState({createDreamboardBorderStyle});
   };
@@ -44,12 +55,10 @@ export default class MyVisionboards extends React.Component {
   
   closeCreateDreamboardModal() {
     this.setState({showCreateDreamboardModal: false});
-    console.log("teest",this.state);
   }
 
   openCreateDreamboardModal() {
     this.setState({ showCreateDreamboardModal: true });
-    console.log("teest",this.state);
     
   }
 
@@ -58,14 +67,31 @@ export default class MyVisionboards extends React.Component {
     const title = this.state.createDreamboardTitle;
     const backgroundStyle = this.state.createDreamboardBGStyle;
     const borderStyle = this.state.createDreamboardBorderStyle;
-    const id = Date.now();
-    const demo ={id, title,backgroundStyle,borderStyle};
-    const activeDreamboard = id;
-    this.setState({activeDreamboard});
-    console.log("demo: ",demo);
-    this.closeCreateDreamboardModal();
-    this.showEditDreamboardPage(demo);
+    const user = this.props.route.user();
+    const { uid } = user;
+    console.log('user to save',user.uid);
+    const data ={uid, title,backgroundStyle,borderStyle};
+    // const demo ={id, title,backgroundStyle,borderStyle};
+    // console.log("demo: ",demo);
+    this.saveNewDreamboard(data).then((result)=>{
+      console.log("succesfully saved new vboard,",result);
+      const activeDreamboard = result.key;
+      console.log("new key",activeDreamboard);
+      this.setState({activeDreamboard});
+      this.closeCreateDreamboardModal();
+      this.showEditDreamboardPage(result);
+    
+  }).catch((error) =>{
+        console.log("error saving new vboard",error);
+   
+        });
   }
+
+  saveNewDreamboard(data){
+     return this.visionboards.push(data);   
+  }
+
+  
 
   showEditDreamboardPage(demo){
     this.setState({demo});
@@ -76,7 +102,7 @@ export default class MyVisionboards extends React.Component {
     const authed = this.props.route.authed();
     const onClickFn = this.openCreateDreamboardModal.bind(this);
     console.log("on main page authed: " + authed)
-    console.log("MyVisionboards");
+    console.log("MyVisionboards ,user",this.props.route.user());
     if(!authed){
        return (
         <div>
@@ -96,7 +122,7 @@ export default class MyVisionboards extends React.Component {
         </div>
       );
     }else{
-        const activeDreamboard = this.state.activeDreamboard!==null?<VisionboardEditor edit={true} demo={this.state.demo}/>: <div></div>;
+        const activeDreamboard = this.state.activeDreamboard!==null?<VisionboardEditor firebase={this.firebase} edit={true} id={this.state.activeDreamboard}/>: <div></div>;
     return (
         <div>
           <div class="row">

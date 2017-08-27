@@ -13,7 +13,7 @@ export default class NukunText extends React.Component {
     const s2 = text.length>3?text.substring(middle-1,middle):"";
     const s3 = text.length>3?text.substring(middle):"";
     
-   return <a style={style} class="link link--nukun" >{s1}<span>{s2}</span>{s3}</a>
+   return <a  ref={this.props.inputRef} style={style} class="link link--nukun" >{s1}<span>{s2}</span>{s3}</a>
 
 
    

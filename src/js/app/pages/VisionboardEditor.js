@@ -37,7 +37,9 @@ export default class VisionboardEditor extends React.Component {
       addPhotoSecondaryTextStyle:{color:"black"},
       demoImgClass:"effect-steve",
       addPhotoSrc:"https://farm3.staticflickr.com/2580/3837389579_d8eea2e9e0_c.jpg",
-      addPhotoUrl:""
+      addPhotoUrl:"",
+      layout:[],
+      layoutElements:[]
      };
      
   }
@@ -48,7 +50,6 @@ export default class VisionboardEditor extends React.Component {
   }
 
   handleAddTextBGChange = (color) => {
-    console.log("recievedColor ",color)
     const addTextBGStyle = {background:color.hex};
     this.setState({addTextBGStyle});
   };
@@ -57,7 +58,6 @@ export default class VisionboardEditor extends React.Component {
     const addTextText = e.target.value;
     this.setState({addTextText});
     if(addTextText.length>=10){
-      console.log("greater than or equal to 10");
       this.msg.show('Text limited to 10 characters', {
       time: 3000,
       icon: <i class="fa fa-info-circle font25"></i>
@@ -68,7 +68,6 @@ export default class VisionboardEditor extends React.Component {
     const addPhotoPrimaryText = e.target.value;
     this.setState({addPhotoPrimaryText});
     if(addPhotoPrimaryText.length>=15){
-      console.log("greater than or equal to 10");
       this.msg2.show('Text limited to 15 characters', {
       time: 3000,
       icon: <i class="fa fa-info-circle font25"></i>
@@ -83,7 +82,6 @@ export default class VisionboardEditor extends React.Component {
     const addPhotoSecondaryText = e.target.value;
     this.setState({addPhotoSecondaryText});
     if(addPhotoSecondaryText.length>=30){
-      console.log("greater than or equal to 10");
       this.msg2.show('Text limited to 30 characters', {
       time: 3000,
       icon: <i class="fa fa-info-circle font25"></i>
@@ -98,31 +96,45 @@ export default class VisionboardEditor extends React.Component {
   handleAddTextStyleChange(eventKey){
     const addTextEffect = eventKey;
     this.setState({addTextEffect});
-    console.log("add text style change",eventKey);
   }
   
   closeAddTextModal() {
     this.setState({showAddTextModal: false});
-    console.log("teest",this.state);
   }
 
   openAddTextModal() {
     this.setState({ showAddTextModal: true });
-    console.log("teest",this.state);
     
   }
   closeAddPhotoModal() {
     this.setState({showAddPhotoModal: false});
-    console.log("teest",this.state);
   }
 
   openAddPhotoModal() {
     this.setState({ showAddPhotoModal: true });
-    console.log("teest",this.state);
     
   }
   addTextToBoard(){
     console.log("add text");
+    const visionboardId = this.props.id;
+    const text = this.state.addTextText;
+    const effect = this.state.addTextEffect;
+    const backgroundStyle = this.state.addTextBGStyle;
+    const w = Math.ceil(1200/(this.inputElement.clientWidth+35));
+    const h = (120/this.inputElement.clientHeight);
+    const x = 6;
+    const y = 6;
+    const createdDate = Date.now();
+    const data = {visionboardId,text,effect,backgroundStyle,w,h,x,y,createdDate};
+    console.log("addTextData",data);
+    this.visionboardTextElements.push(data).then((result)=>{
+      console.log("success adding text element: ",result);
+      this.closeAddTextModal();
+      this.refreshVisionboard();
+    }).catch((error)=>{
+      console.log("error",error);
+    });
+
   }
 
   handleAddPhotoCustomUrlChange(e){
@@ -146,6 +158,11 @@ export default class VisionboardEditor extends React.Component {
 
   componentDidMount(){
     console.log("did mount");
+    if(this.props.firebase){
+      console.log("firebase found setting db");
+      this.visionboardTextElements = this.props.firebase.database().ref("/visiontext");
+      this.visionboardPhotoElements = this.props.firebase.database().ref("/visionphoto");
+    }
     if(this.props.demo){
       console.log("demo mode");
         const { demo } = this.props;
@@ -161,21 +178,113 @@ export default class VisionboardEditor extends React.Component {
         }
     }else{
       console.log("prod mode");
-      this.fetchVisionBoard(this.props.id);
+      const { id } = this.props ;
+      const { edit } = this.props;
+      this.setState({id,edit});
+      this.refreshVisionboard();
     }
+  }
+
+  
+  createElement(el) {
+    var removeStyle = {
+      position: 'absolute',
+      right: '2px',
+      top: 0,
+      cursor: 'pointer'
+    };
+    var i = el.i;
+    return (
+      <div key={i} data-grid={el}>
+         {this.getTextElement(i)}
+        <span className="remove" style={removeStyle} onClick={()=>{console.log("remove");}}>x</span>
+      </div>
+    );
+  }
+
+  refreshVisionboard(){
+    var layout = [];
+    var layoutElements = [];
+    if(this.visionboardTextElements)
+      this.visionboardTextElements.orderByChild("visionboardId").equalTo(this.props.id)
+        .on("child_added", function(snapshot) {
+          const el =this.getTextElementForLayout(snapshot)
+          layout.push(el);
+          layoutElements.push(this.getTextElement(snapshot,el))
+        }.bind(this));
+    if(this.visionboardPhotoElements)
+      this.visionboardPhotoElements.orderByChild("visionboardId").equalTo(this.props.id)
+        .on("child_added", function(snapshot) {  
+          this.addPhotoElementToLayout(snapshot);
+        }.bind(this));
+    console.log("layout",layout);
+    this.setState({layout});
+    console.log("layoutElements",layoutElements);
+    this.setState({layoutElements});
+    console.log("visionboard refreshed");
+  }
+
+
+  getTextElementForLayout(element){
+    console.log("add text element",element," to layout");
+    const w = element.child("w").val();
+    const h = element.child("h").val();
+    const x = element.child("x").val();
+    const y = element.child("y").val();
+    const i = element.key;
+    const el = {w,h,x,y,i};
+    console.log("at text to layout: ",el);
+    return el;
+  }
+
+  getTextElement(elementId){
+      console.log("looking for textElement with key,",elementId);
+      const test = "-KsXikgAKWLidSfReHS-";
+      console.log("j" + JSON.stringify(elementId));
+      console.log("test",test);
+      const ref="/visiontext/"+test;
+
+    if(this.props.firebase){
+      const visionText = this.props.firebase.database().ref("/visiontext/"+test);
+      visionText.once("value").then((result)=>{
+          console.log("got el,",result);
+          const text = result.child("text").val();
+          const effect = result.child("effect").val();
+          const backgroundStyle = result.child("backgroundStyle").val();
+          return <VisionText style={backgroundStyle} text={text} effect={effect} /> 
+      } );
+    }
+
+  }
+
+  addPhotoElementToLayout(key){
+
   }
 
   render() {
 
+    console.log("state,",this.state);
+
+    if(this.inputElement){
+      console.log("my text element: ",this.inputElement);
+      console.log("w",this.inputElement.clientWidth+35,"h",this.inputElement.clientHeight);
+    }
 
     console.log("dreamboard editor render");
     console.log("state, ",this.state);
     const title = this.state.title;
-    var layout = [
-      {i: 'ag', x: 0, y: 0, w: 1, h: 2, static: true},
-      {i: 'bg', x: 1, y: 0, w: 3, h: 2, minW: 2, maxW: 4},
-      {i: 'cg', x: 4, y: 0, w: 1, h: 2}
-    ];
+    // var layout = [
+    //   {i: 'ag', x: 0, y: 0, w: 1, h: 2, static: true},
+    //   {i: 'bg', x: 1, y: 0, w: 3, h: 2, minW: 2, maxW: 4},
+    //   {i: 'cg', x: 4, y: 0, w: 1, h: 2}
+    // ];
+   var layout2=this.state.layout;
+    var layout = [{w: 4, h: 1.5, x: 6, y: 6, i: "-KsXO7fJRppSG8t8Fi1G"}];
+    var layoutElements = [<div key={"-KsXO7fJRppSG8t8Fi1G"}> <VisionText style={this.state.addTextBGStyle} text={this.state.addTextText} effect={this.state.addTextEffect} /></div>];
+    var layoutElements2 = this.state.layoutElements;
+    console.log(layout,layout2);
+    console.log(layoutElements,layoutElements2);
+    console.log("test ",layout,layoutElements);
     console.log("edit",this.state.edit);
     const addTextButton = this.state.edit?<div class="pull-right"><NinaButton onClickFn={this.openAddTextModal.bind(this)} btnText="Add Text" btnHoverText="add" btnClass="primary" /></div>:<div></div>;
        const addPhotoButton = this.state.edit?<NinaButton onClickFn={this.openAddPhotoModal.bind(this)} btnText="Add Photo" btnHoverText="add" btnClass="primary" />:<div></div>;
@@ -206,12 +315,10 @@ export default class VisionboardEditor extends React.Component {
                {addPhotoButton}
           </div>
         </div>
-        <div class="width1200" style={this.state.backgroundStyle}>
-          <div class="width1200" style={this.state.borderStyle}>
-            <ReactGridLayout className="layout" layout={layout} cols={12} rowHeight={30} width={1200}>
-              <div key={'ag'}>a</div>
-              <div key={'bg'}>b</div>
-              <div key={'cg'}>c</div>
+        <div class="width1200" style={{background:"black"}}>
+          <div class="width1200" style={{border:"12px solid white"}}>
+            <ReactGridLayout className="layout" layout={this.state.layout} cols={12} rowHeight={30} width={1200}>
+              {_.map(this.state.layout, this.createElement.bind(this))}
             </ReactGridLayout>
           </div>
         </div>
@@ -229,7 +336,7 @@ export default class VisionboardEditor extends React.Component {
               <div class="col-md-3">
                 </div>
               <div class="col-md-6 text-center">
-                  <VisionText style={this.state.addTextBGStyle} text={this.state.addTextText} effect={this.state.addTextEffect}/>
+                  <VisionText inputRef={el => this.inputElement = el} style={this.state.addTextBGStyle} text={this.state.addTextText} effect={this.state.addTextEffect}/>
               </div>
               <div class="col-md-3">
                 </div>

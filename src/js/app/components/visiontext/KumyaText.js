@@ -8,7 +8,7 @@ export default class KumyaText extends React.Component {
     const { style } = this.props;
 
     
-   return <a style={style} class="link link--kumya"><span data-letters={text}>{text}</span></a>
+   return <a  ref={this.props.inputRef} style={style} class="link link--kumya"><span data-letters={text}>{text}</span></a>
 
    
   }

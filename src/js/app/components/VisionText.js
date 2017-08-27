@@ -11,19 +11,19 @@ export default class VisionText extends React.Component {
     const { effect } = this.props;
     const { text } = this.props;
     const { style } = this.props;
-    console.log("effect: " + effect,"text",text);
+    console.log("render vision text effect: " + effect,"text",text);
     switch(effect){
         case"ilin":{
-            return <IlinText text={text} style={style}/>;
+            return <IlinText inputRef={this.props.inputRef}  text={text} style={style}/>;
         }
         case"kukuri":{
-            return <KukuriText text={text} style={style}/>;
+            return <KukuriText inputRef={this.props.inputRef} text={text} style={style}/>;
         }
         case"kumya":{
-            return <KumyaText text={text} style={style}/>;
+            return <KumyaText inputRef={this.props.inputRef} text={text} style={style}/>;
         }
         case"nukun":{
-            return <NukunText text={text} style={style}/>;
+            return <NukunText inputRef={this.props.inputRef} text={text} style={style}/>;
         }
         default:{
             return<div></div>
