@@ -9,24 +9,40 @@ import AlertContainer from 'react-alert';
 import FlickrImage from '../components/FlickrImage';
 import VisionImage from '../components/VisionImage';
 import ImageSearch from './ImageSearch';
+import { connect } from 'react-redux'
+import PropTypes from 'prop-types'
+import {
+  firebaseConnect,
+  isLoaded,
+  pathToJS,
+  dataToJS 
+} from 'react-redux-firebase'
+import VisionboardPreview from '../components/VisionboardPreview';
 
 
 
+var ReactGridLayout = require('react-grid-layout');
+
+@firebaseConnect()
+@connect(({ firebase }) => ({
+  auth: pathToJS(firebase, 'auth'),
+  account: pathToJS(firebase, 'profile')
+}))
 export default class VisionboardEditor extends React.Component {
 
   constructor(){
     super();
     this.state={
-      title:"",
+      visionboardTitle:"",
       edit:false,
       addTextBGStyle:{background:"red"},
-      addTextText:"kumya",
+      addTextText:"text",
       addTextEffect:"kumya",
       showAddTextModal:false,
        alertOptions : {
           offset: 14,
-          position: 'top left',
-          theme: 'dark',
+          position: 'top right',
+          theme: 'light',
           time: 5000,
           transition: 'scale'
         },
@@ -35,8 +51,8 @@ export default class VisionboardEditor extends React.Component {
       addPhotoSecondaryText:"Secondary text here",
       addPhotoPrimaryTextStyle:{color:"black"},
       addPhotoSecondaryTextStyle:{color:"black"},
-      demoImgClass:"effect-steve",
-      addPhotoSrc:"https://farm3.staticflickr.com/2580/3837389579_d8eea2e9e0_c.jpg",
+      addPhotoImgClass:"effect-steve",
+      addPhotoSrc:"https://education.microsoft.com/Assets/images/workspace/placeholder-camera-760x370.png",
       addPhotoUrl:"",
       layout:[],
       layoutElements:[]
@@ -45,8 +61,8 @@ export default class VisionboardEditor extends React.Component {
   }
 
   changeImageEffect(eventKey){
-    const demoImgClass = eventKey;
-    this.setState({demoImgClass});
+    const addPhotoImgClass = eventKey;
+    this.setState({addPhotoImgClass});
   }
 
   handleAddTextBGChange = (color) => {
@@ -103,38 +119,67 @@ export default class VisionboardEditor extends React.Component {
   }
 
   openAddTextModal() {
-    this.setState({ showAddTextModal: true });
-    
+    this.setState({ showAddTextModal: true});
   }
   closeAddPhotoModal() {
     this.setState({showAddPhotoModal: false});
   }
 
   openAddPhotoModal() {
-    this.setState({ showAddPhotoModal: true });
-    
+    this.setState({ showAddPhotoModal: true});
   }
   addTextToBoard(){
-    console.log("add text");
     const visionboardId = this.props.id;
     const text = this.state.addTextText;
     const effect = this.state.addTextEffect;
     const backgroundStyle = this.state.addTextBGStyle;
-    const w = Math.ceil(1200/(this.inputElement.clientWidth+35));
-    const h = (120/this.inputElement.clientHeight);
-    const x = 6;
-    const y = 6;
+    var w = Math.abs((Math.round((this.inputElement.clientWidth+35)/100 * 2) / 2).toFixed(1));
+    const h = (this.inputElement.clientHeight/35);
+    const x = 12;
+    const y = 1200;
     const createdDate = Date.now();
     const data = {visionboardId,text,effect,backgroundStyle,w,h,x,y,createdDate};
-    console.log("addTextData",data);
-    this.visionboardTextElements.push(data).then((result)=>{
-      console.log("success adding text element: ",result);
-      this.closeAddTextModal();
-      this.refreshVisionboard();
-    }).catch((error)=>{
-      console.log("error",error);
+    const update = this.getSaveUpdates();
+    this.props.firebase.database().ref().update(update).then((res)=>{
+      this.visionboardTextElementsDb.push(data).then((result)=>{
+        this.refreshBoard();
+        this.closeAddTextModal();
+      }).catch((error)=>{
+        console.log("error",error);
+      });
     });
 
+  }
+
+  addPhotoToBoard(){
+    const visionboardId = this.props.id;
+    const primaryText = this.state.addPhotoPrimaryText;
+    const primaryTextStyle = this.state.addPhotoPrimaryTextStyle;
+    const secondaryText = this.state.addPhotoSecondaryText;
+    const secondaryTextStyle = this.state.addPhotoSecondaryTextStyle;
+    const imgClass = this.state.addPhotoImgClass;
+    const imgSrc = this.state.addPhotoSrc;
+    const w = 3;
+    const h = 8;
+    const x = 12;
+    const y = 1200;
+    const createdDate = Date.now();
+    const data = {visionboardId,imgSrc,imgClass,primaryText,primaryTextStyle,secondaryText,secondaryTextStyle,w,h,x,y,createdDate};
+    const update = this.getSaveUpdates();
+    this.props.firebase.database().ref().update(update).then((res)=>{
+       this.visionboardPhotoElementsDb.push(data).then((result)=>{
+          this.refreshBoard();
+          this.closeAddPhotoModal();
+       }).catch((error)=>{
+          console.log("error",error);
+        });
+    });
+   
+  }
+
+  refreshBoard(){
+    this.destroyListeners();
+    this.setUp();
   }
 
   handleAddPhotoCustomUrlChange(e){
@@ -143,7 +188,6 @@ export default class VisionboardEditor extends React.Component {
   }
 
   loadUrl(addPhotoSrc){
-    console.log("load Url,",addPhotoSrc);
     this.setState({addPhotoSrc});
   }
 
@@ -152,16 +196,54 @@ export default class VisionboardEditor extends React.Component {
   }
 
   photoSelected(src){
-    console.log("photo selected,",src.src);
     this.loadUrl(src.src);
+  }
+  componentWillUnmount(){
+    this.destroyListeners();
+  }
+
+  destroyListeners(){
+    this.visionboardTextElements.off();
+    this.visionboardPhotoElements.off();
   }
 
   componentDidMount(){
-    console.log("did mount");
+    this.setUp();
+    const {edit}=this.props;
+    this.setState({edit});
+  }
+
+  setUp(){
+    this.setState({
+      visionboardTitle:"",
+      addTextBGStyle:{background:"red"},
+      addTextText:"Text",
+      addTextEffect:"kumya",
+      showAddTextModal:false,
+       alertOptions : {
+          offset: 14,
+          position: 'top right',
+          theme: 'light',
+          time: 5000,
+          transition: 'scale'
+        },
+      showAddPhotoModal:false,
+      addPhotoPrimaryText:"Primary",
+      addPhotoSecondaryText:"Secondary text here",
+      addPhotoPrimaryTextStyle:{color:"black"},
+      addPhotoSecondaryTextStyle:{color:"black"},
+      addPhotoImgClass:"effect-steve",
+      addPhotoSrc:"https://education.microsoft.com/Assets/images/workspace/placeholder-camera-760x370.png",
+      addPhotoUrl:"",
+      layout:[],
+      layoutElements:[]
+     });
     if(this.props.firebase){
-      console.log("firebase found setting db");
-      this.visionboardTextElements = this.props.firebase.database().ref("/visiontext");
-      this.visionboardPhotoElements = this.props.firebase.database().ref("/visionphoto");
+      this.visionboardPhotoElementsDb = this.props.firebase.database().ref("/visionphoto");
+      this.visionboardTextElementsDb = this.props.firebase.database().ref("/visiontext");
+      this.visionboardTextElements = this.props.firebase.database().ref("/visiontext").orderByChild("visionboardId").equalTo(this.props.id);
+      this.visionboardPhotoElements = this.props.firebase.database().ref("/visionphoto").orderByChild("visionboardId").equalTo(this.props.id);
+      this.visionboardElement = this.props.firebase.database().ref("/visionboards/"+this.props.id);
     }
     if(this.props.demo){
       console.log("demo mode");
@@ -171,124 +253,200 @@ export default class VisionboardEditor extends React.Component {
         const { backgroundStyle } = demo;
         const { borderStyle } = demo;
         this.setState({title,demo,layout,backgroundStyle,borderStyle});
-        const { edit } = this.props;
-        if(edit){
+        const { edit } = this.state;
 
-          this.setState({edit});
-        }
     }else{
-      console.log("prod mode");
       const { id } = this.props ;
-      const { edit } = this.props;
-      this.setState({id,edit});
-      this.refreshVisionboard();
+      this.setState({id});
+      this.setUpVisionboard();
     }
   }
-
   
   createElement(el) {
+
     var removeStyle = {
       position: 'absolute',
       right: '2px',
       top: 0,
-      cursor: 'pointer'
+      cursor: 'pointer',
+      color:'white',
+      fontSize:"25px",
+      textShadow: "0 0 5px black",
+      zIndex:"999"
     };
-    var i = el.i;
-    return (
-      <div key={i} data-grid={el}>
-         {this.getTextElement(i)}
-        <span className="remove" style={removeStyle} onClick={()=>{console.log("remove");}}>x</span>
-      </div>
-    );
+
+    if(!this.state.edit){
+      removeStyle = {
+      position: 'absolute',
+      right: '2px',
+      top: 0,
+      cursor: 'pointer',
+      color:'white',
+      fontSize:"25px",
+      textShadow: "0 0 5px black",
+      zIndex:"999",
+      visibility: "hidden"
+    };
+    }
+
+    const i = el.i;
+    const type = el.type;
+    if (type === "text"){ 
+       return (
+            <div key={i} data-grid={el}>
+              <span className="remove" style={removeStyle} onClick={function(){this.deleteElement(i,type);}.bind(this)}><i class="fa fa-times-circle"></i></span>
+              <VisionText key={i} style={el.backgroundStyle} text={el.text} effect={el.effect} /> 
+            </div>
+          );
+    }else{
+       return (
+          <div key={i} data-grid={el}>
+            <span className="remove" style={removeStyle} onClick={function(){this.deleteElement(i,type);}.bind(this)}><i class="fa fa-times-circle"></i></span>
+              <VisionImage key={i} primaryTextStyle={el.primaryTextStyle} secondaryTextStyle={el.secondaryTextStyle}  imgClass={el.imgClass}  title={el.primaryText} subTitle={el.secondaryText}  src={el.imgSrc}/>             
+
+          </div>
+          );
+    }
+   
   }
 
-  refreshVisionboard(){
+  deleteElement(elementId,type){
+    const update = this.getSaveUpdates();
+    this.props.firebase.database().ref().update(update).then((res)=>{
+        if(type === "text"){
+          this.props.firebase.database().ref("/visiontext/"+elementId).remove();
+          this.refreshBoard();
+        }
+        else{
+          this.props.firebase.database().ref("/visionphoto/"+elementId).remove();
+          this.refreshBoard();
+        }
+    });
+   
+  }
+
+  setUpVisionboard(){
     var layout = [];
     var layoutElements = [];
-    if(this.visionboardTextElements)
-      this.visionboardTextElements.orderByChild("visionboardId").equalTo(this.props.id)
+  
+    if(this.visionboardElement){
+      this.visionboardElement.once('value',function(snapshot){
+        const visionboardTitle = snapshot.child("title").val();
+        const visionboardBackgroundStyle = snapshot.child("backgroundStyle").val();
+        const visionboardBorderStyle = snapshot.child("borderStyle").val();
+        this.setState({visionboardTitle,visionboardBackgroundStyle,visionboardBorderStyle})
+      }.bind(this));
+
+    }
+    if(this.visionboardTextElements){
+      
+      this.visionboardTextElements
         .on("child_added", function(snapshot) {
           const el =this.getTextElementForLayout(snapshot)
-          layout.push(el);
-          layoutElements.push(this.getTextElement(snapshot,el))
+          const layout = [...this.state.layout,el];
+          this.setState({layout});
         }.bind(this));
-    if(this.visionboardPhotoElements)
-      this.visionboardPhotoElements.orderByChild("visionboardId").equalTo(this.props.id)
+  }
+    if(this.visionboardPhotoElements){
+      this.visionboardPhotoElements
         .on("child_added", function(snapshot) {  
-          this.addPhotoElementToLayout(snapshot);
+          const el =this.getPhotoElementForLayout(snapshot)
+          const layout = [...this.state.layout,el];
+          this.setState({layout});
         }.bind(this));
-    console.log("layout",layout);
-    this.setState({layout});
-    console.log("layoutElements",layoutElements);
-    this.setState({layoutElements});
-    console.log("visionboard refreshed");
+       }
   }
 
 
+  onLayoutChange(layout){
+    const dirtyLayout = layout;
+    this.setState({dirtyLayout});
+  }
+
   getTextElementForLayout(element){
-    console.log("add text element",element," to layout");
     const w = element.child("w").val();
     const h = element.child("h").val();
     const x = element.child("x").val();
     const y = element.child("y").val();
     const i = element.key;
-    const el = {w,h,x,y,i};
-    console.log("at text to layout: ",el);
+    const isResizable = false;
+    const isDraggable = this.state.edit;
+    const text = element.child("text").val();
+    const effect = element.child("effect").val();
+    const backgroundStyle = element.child("backgroundStyle").val();
+    const type= "text";
+    const el = {w,h,x,y,i,isResizable,isDraggable,type,text,effect,backgroundStyle};
     return el;
   }
 
-  getTextElement(elementId){
-      console.log("looking for textElement with key,",elementId);
-      const test = "-KsXikgAKWLidSfReHS-";
-      console.log("j" + JSON.stringify(elementId));
-      console.log("test",test);
-      const ref="/visiontext/"+test;
 
-    if(this.props.firebase){
-      const visionText = this.props.firebase.database().ref("/visiontext/"+test);
-      visionText.once("value").then((result)=>{
-          console.log("got el,",result);
-          const text = result.child("text").val();
-          const effect = result.child("effect").val();
-          const backgroundStyle = result.child("backgroundStyle").val();
-          return <VisionText style={backgroundStyle} text={text} effect={effect} /> 
-      } );
-    }
 
+  getPhotoElementForLayout(element){
+    const w = element.child("w").val();
+    const h = element.child("h").val();
+    const x = element.child("x").val();
+    const y = element.child("y").val();
+    const i = element.key;
+    const isResizable = false;
+    const isDraggable = this.state.edit;
+    const primaryText = element.child("primaryText").val();
+    const primaryTextStyle = element.child("primaryTextStyle").val();
+    const secondaryText = element.child("secondaryText").val();
+    const secondaryTextStyle = element.child("secondaryTextStyle").val();
+    const imgClass = element.child("imgClass").val();
+    const imgSrc = element.child("imgSrc").val();
+    const type= "photo";
+    const el = {w,h,x,y,i,isResizable,isDraggable,type,primaryText,secondaryText,primaryTextStyle,secondaryTextStyle,imgClass,imgSrc};
+    return el;
   }
 
-  addPhotoElementToLayout(key){
 
+  saveBoard(){
+    const update = this.getSaveUpdates();
+    this.props.firebase.database().ref().update(update).then((result)=>{
+      this.refreshBoard();
+      this.mainMsg.show('Succsfully saved vision board', {
+        time: 3000,
+        icon: <i style={{color:"green",fontSize:"2em"}} class="fa fa-check-circle font25"></i>
+      });    
+    }).catch((error)=>{
+      console.log("error saving visionboard");
+      this.mainMsg.show('Error saving layout', {
+      time: 3000,
+      icon: <i style={{color:"green",fontSize:"2em"}} class="fa fa-exclamation-circle font25"></i>
+     });
+    });
+   
   }
+
+  getSaveUpdates(){
+        var update = {};
+    _.forEach(this.state.dirtyLayout,(value,index)=>{
+      if(value.h<8){
+        update['/visiontext/'+value.i+"/x"]=value.x>=0?value.x:0;
+        update['/visiontext/'+value.i+"/y"]=value.y>=0?value.y:0;
+      }else{
+        update['/visionphoto/'+value.i+"/x"]=value.x>=0?value.x:0;
+        update['/visionphoto/'+value.i+"/y"]=value.y>0?value.y:0;
+      }
+    });
+    return update;
+  }
+
+ closeVisionBoard(){
+   this.props.closeBoard();
+ }
+
 
   render() {
-
-    console.log("state,",this.state);
-
-    if(this.inputElement){
-      console.log("my text element: ",this.inputElement);
-      console.log("w",this.inputElement.clientWidth+35,"h",this.inputElement.clientHeight);
-    }
-
-    console.log("dreamboard editor render");
-    console.log("state, ",this.state);
     const title = this.state.title;
-    // var layout = [
-    //   {i: 'ag', x: 0, y: 0, w: 1, h: 2, static: true},
-    //   {i: 'bg', x: 1, y: 0, w: 3, h: 2, minW: 2, maxW: 4},
-    //   {i: 'cg', x: 4, y: 0, w: 1, h: 2}
-    // ];
-   var layout2=this.state.layout;
-    var layout = [{w: 4, h: 1.5, x: 6, y: 6, i: "-KsXO7fJRppSG8t8Fi1G"}];
-    var layoutElements = [<div key={"-KsXO7fJRppSG8t8Fi1G"}> <VisionText style={this.state.addTextBGStyle} text={this.state.addTextText} effect={this.state.addTextEffect} /></div>];
-    var layoutElements2 = this.state.layoutElements;
-    console.log(layout,layout2);
-    console.log(layoutElements,layoutElements2);
-    console.log("test ",layout,layoutElements);
-    console.log("edit",this.state.edit);
-    const addTextButton = this.state.edit?<div class="pull-right"><NinaButton onClickFn={this.openAddTextModal.bind(this)} btnText="Add Text" btnHoverText="add" btnClass="primary" /></div>:<div></div>;
-       const addPhotoButton = this.state.edit?<NinaButton onClickFn={this.openAddPhotoModal.bind(this)} btnText="Add Photo" btnHoverText="add" btnClass="primary" />:<div></div>;
-     const tooltip = (
+    const addTextButton = <div class="pull-right"><NinaButton hide={!this.state.edit} onClickFn={this.openAddTextModal.bind(this)} btnText="Add Text" btnHoverText="add" btnClass="primary" /></div>;
+    const addPhotoButton = <NinaButton hide={!this.state.edit} onClickFn={this.openAddPhotoModal.bind(this)} btnText="Add Photo" btnHoverText="add" btnClass="primary" />;
+    const saveBoardButton = <NinaButton hide={!this.state.edit} onClickFn={function(){ this.setState({edit:false},function(){ this.saveBoard();}.bind(this));}.bind(this)} btnText="Save" btnHoverText="save" btnClass="success" />;
+    const editButton = <NinaButton hide={this.state.edit} onClickFn={function(){this.setState({edit:true}); this.refreshBoard();}.bind(this)} btnText="Edit" btnHoverText="edit" btnClass="success" />;
+    const doneButton = <NinaButton hide={this.state.edit} onClickFn={this.closeVisionBoard.bind(this)} btnText="Done" btnHoverText="done" btnClass="success" />;
+    const nothingHere = this.state.layout.length==0?<h2>To add to your vision board, click 'add photo' or 'add text'</h2>:<div></div>;
+    const tooltip = (
       <Tooltip id="modal-tooltip">
         Text limited to 10 characters.
       </Tooltip>
@@ -301,26 +459,35 @@ export default class VisionboardEditor extends React.Component {
         Text limited to 30 characters.
       </Tooltip>
     );
-    
     return (
       <div>
         <div class="row">
+        <AlertContainer ref={a => this.mainMsg = a} {...this.state.alertOptions} />
+
           <div class="col-md-6">
-            <h1 class="pull-right">{title}</h1>
+            <h1 class="pull-left">{this.state.visionboardTitle}</h1>
           </div>
-          <div class="col-md-3">
+          <div class="col-md-2">
                {addTextButton}
           </div> 
-          <div class="col-md-3">
+          <div class="col-md-2">
                {addPhotoButton}
+               {editButton}
           </div>
+          <div class="col-md-2">
+               {saveBoardButton}
+               {doneButton}
+          </div>          
         </div>
-        <div class="width1200" style={{background:"black"}}>
-          <div class="width1200" style={{border:"12px solid white"}}>
-            <ReactGridLayout className="layout" layout={this.state.layout} cols={12} rowHeight={30} width={1200}>
-              {_.map(this.state.layout, this.createElement.bind(this))}
-            </ReactGridLayout>
+        <div class="row marginBottom2em">
+          <div class="width1200" style={this.state.visionboardBackgroundStyle}>
+            <div class="width1200" style={this.state.visionboardBorderStyle}>
+              <ReactGridLayout onLayoutChange={this.onLayoutChange.bind(this)} className="layout" layout={this.state.layout} cols={12} rowHeight={30} width={1200}>
+                {_.map(this.state.layout, this.createElement.bind(this))}
+              </ReactGridLayout>
+            </div>
           </div>
+        {nothingHere}
         </div>
         <Modal bsSize="large" show={this.state.showAddTextModal} onHide={this.closeAddTextModal.bind(this)}>
           <Modal.Header closeButton>
@@ -385,7 +552,7 @@ export default class VisionboardEditor extends React.Component {
               <div class="col-md-4">
               </div>
               <div class="col-md-6 marginBottom2em marginRight2em">
-                <VisionImage primaryTextStyle={this.state.addPhotoPrimaryTextStyle} secondaryTextStyle={this.state.addPhotoSecondaryTextStyle}  imgClass={this.state.demoImgClass} key="34728344012"  title={this.state.addPhotoPrimaryText} subTitle={this.state.addPhotoSecondaryText} id="34728344012" src={this.state.addPhotoSrc}/>             
+                <VisionImage primaryTextStyle={this.state.addPhotoPrimaryTextStyle} secondaryTextStyle={this.state.addPhotoSecondaryTextStyle}  imgClass={this.state.addPhotoImgClass} key="34728344012"  title={this.state.addPhotoPrimaryText} subTitle={this.state.addPhotoSecondaryText} id="34728344012" src={this.state.addPhotoSrc}/>             
               </div>
               <div class="col-md-3">
               </div>
@@ -396,7 +563,7 @@ export default class VisionboardEditor extends React.Component {
                 <div class="col-md-2">
               </div>
                <div class="col-md-2 form-responsive" style={{marginBottom:"15px", paddingLeft:"3.5em"}}>
-                    <DropdownButton  bsStyle="primary" title={this.state.demoImgClass.split("-")[1]} id="bg-nested-dropdown">
+                    <DropdownButton  bsStyle="primary" title={this.state.addPhotoImgClass.split("-")[1]} id="bg-nested-dropdown">
                       <MenuItem onSelect={this.changeImageEffect.bind(this)}  eventKey="effect-apollo">Apollo</MenuItem>
                       
                       <MenuItem onSelect={this.changeImageEffect.bind(this)}  eventKey="effect-bubba">Bubba</MenuItem>
@@ -495,7 +662,7 @@ export default class VisionboardEditor extends React.Component {
            
             </Modal.Body>
           <Modal.Footer>
-            <Button bsStyle="primary" onClick={this.addTextToBoard.bind(this)}>Add</Button>
+            <Button bsStyle="primary" onClick={this.addPhotoToBoard.bind(this)}>Add</Button>
             <Button  onClick={this.closeAddTextModal.bind(this)}>Close</Button>
           </Modal.Footer>
         </Modal>

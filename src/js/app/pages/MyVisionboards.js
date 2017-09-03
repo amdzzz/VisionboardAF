@@ -2,15 +2,30 @@ import React from "react";
 import { Link } from 'react-router';
 import Article from "../components/Article";
 import { Modal, Tooltip, Popover, Button, OverlayTrigger,DropdownButton, MenuItem } from "react-bootstrap";
-import NinaButton from "../components/NinaButton";
-import YokoInput from "../components/YokoInput";
-import ColorPickerWrapper from '../components/ColorPickerWrapper';
-import VisionboardEditor from './VisionboardEditor'; 
+import NinaButton from "../components/NinaButton"
+import YokoInput from "../components/YokoInput"
+import ColorPickerWrapper from '../components/ColorPickerWrapper'
+import VisionboardEditor from './VisionboardEditor'
+import { connect } from 'react-redux'
+import PropTypes from 'prop-types'
+import AlertContainer from 'react-alert'
+import {
+  firebaseConnect,
+  isLoaded,
+  pathToJS,
+  dataToJS 
+} from 'react-redux-firebase'
+import VisionboardPreview from '../components/VisionboardPreview';
+
 
 
 var ReactGridLayout = require('react-grid-layout');
 
-
+@firebaseConnect()
+@connect(({ firebase }) => ({
+  auth: pathToJS(firebase, 'auth'),
+  account: pathToJS(firebase, 'profile')
+}))
 export default class MyVisionboards extends React.Component {
 
   constructor(){
@@ -22,22 +37,61 @@ export default class MyVisionboards extends React.Component {
       createDreamboardBorderStyle:{border:"6px solid white"},
       activeDreamboard:null,
       demo:{},
+      edit:false,
+      vbSet:false,
+      visionboardPreviewList:[],
+      alertOptions : {
+          offset: 14,
+          position: 'top left',
+          theme: 'dark',
+          time: 5000,
+          transition: 'scale'
+        },
     };
   }
 
-  componentDidMount(){
-    console.log("did mount");
-    this.firebase=this.props.route.firebase;
-    console.log("test mvb",this.firebase);
-    this.visionboards = this.firebase.database().ref("/visionboards");
-    if(this.props.route.user())
-      this.visionboards.orderByChild("uid").equalTo(this.props.route.user().uid)
-      .on("child_added",(snapshot)=>{
-        console.log("dreamboard added:",snapshot.key);
-      });
+
+  componentWillReceiveProps(){
+    if(this.props.firebase && this.props.auth && !this.state.vbSet){
+       var vbs = this.props.firebase.database().ref("visionboards");
+      vbs.orderByChild("uid").equalTo(this.props.auth.uid)
+        .on("child_added", function(snapshot) {
+            const id = snapshot.key;
+            const title = snapshot.child("title").val();
+            var visionboardPreviewList = this.state.visionboardPreviewList;
+            visionboardPreviewList.push(<div class="col-md-4"><VisionboardPreview key={id} onClick={()=>{this.setActiveVisionboard(id)}} id={id} title={title} /></div>)
+            this.setState({visionboardPreviewList});
+         }.bind(this));
+          const vbSet = true;
+          this.setState({vbSet});
+    }
   }
 
+  componentDidMount(){
+    if(this.props.firebase && this.props.auth && !this.state.vbSet){
+       var vbs = this.props.firebase.database().ref("visionboards");
+      vbs.orderByChild("uid").equalTo(this.props.auth.uid)
+        .on("child_added", function(snapshot) {
+            const id = snapshot.key;
+            const title = snapshot.child("title").val();
+            var visionboardPreviewList = this.state.visionboardPreviewList;
+            visionboardPreviewList.push(<div class="col-md-4"><VisionboardPreview key={id} onClick={()=>{this.setActiveVisionboard(id)}} id={id} title={title} /></div>)
+            this.setState({visionboardPreviewList});
+         }.bind(this));
+          const vbSet = true;
+          this.setState({vbSet});
+    }
+  }
 
+  closeVisionBoard(){
+    this.setState({activeDreamboard:null});
+  }
+
+  setActiveVisionboard(activeDreamboard){
+    const edit = false;
+    this.setState({activeDreamboard:null,edit},()=>{ this.setState({activeDreamboard});});     
+   
+  }  
   handleChangecreateDreamBoardBG = (color) => {
     const createDreamboardBGStyle = {background:color.hex};
     this.setState({createDreamboardBGStyle});
@@ -51,6 +105,7 @@ export default class MyVisionboards extends React.Component {
   handleDreamboardTitleChange(e){
     const createDreamboardTitle = e.target.value;
     this.setState({createDreamboardTitle});
+    
   }
   
   closeCreateDreamboardModal() {
@@ -63,21 +118,22 @@ export default class MyVisionboards extends React.Component {
   }
 
   createDreamboard(){
-    console.log("create dreamboard");
+    if(this.state.createDreamboardTitle.length<2){
+      this.msg.show('title must have at least 2 chracters', {
+      time: 3000,
+      icon: <i class="fa fa-info-circle font25"></i>
+     });
+     return;
+    }
     const title = this.state.createDreamboardTitle;
     const backgroundStyle = this.state.createDreamboardBGStyle;
     const borderStyle = this.state.createDreamboardBorderStyle;
-    const user = this.props.route.user();
-    const { uid } = user;
-    console.log('user to save',user.uid);
+    const uid = this.props.auth.uid;
     const data ={uid, title,backgroundStyle,borderStyle};
-    // const demo ={id, title,backgroundStyle,borderStyle};
-    // console.log("demo: ",demo);
     this.saveNewDreamboard(data).then((result)=>{
-      console.log("succesfully saved new vboard,",result);
       const activeDreamboard = result.key;
-      console.log("new key",activeDreamboard);
-      this.setState({activeDreamboard});
+      const edit = true;
+      this.setState({activeDreamboard,edit});
       this.closeCreateDreamboardModal();
       this.showEditDreamboardPage(result);
     
@@ -88,7 +144,7 @@ export default class MyVisionboards extends React.Component {
   }
 
   saveNewDreamboard(data){
-     return this.visionboards.push(data);   
+     return this.props.firebase.database().ref("visionboards").push(data);   
   }
 
   
@@ -97,59 +153,55 @@ export default class MyVisionboards extends React.Component {
     this.setState({demo});
   }
 
-  render() {
+  render() {    
     const layout=[];
-    const authed = this.props.route.authed();
-    const onClickFn = this.openCreateDreamboardModal.bind(this);
-    console.log("on main page authed: " + authed)
-    console.log("MyVisionboards ,user",this.props.route.user());
-    if(!authed){
+    const onClickFn = this.openCreateDreamboardModal.bind(this);   
+    if(!this.props.account){
        return (
         <div>
           <div class="row">
             <div class="col-md-12">
                 <h1 class="wsg-title" >My Visionboards</h1>
-      
-                 <h1> Please log in with google to create or view your Visionboards.</h1>
-                 <h1> See our Demo for more info on what you can create.</h1>
+                <h1> Please log in with google to create or view your Visionboards.</h1>
+                <h1> See our Demo for more info on what you can create.</h1>
             </div>
-           
-
-
           </div>
-                                  <hr></hr>
-
+          <hr></hr>
         </div>
       );
     }else{
-        const activeDreamboard = this.state.activeDreamboard!==null?<VisionboardEditor firebase={this.firebase} edit={true} id={this.state.activeDreamboard}/>: <div></div>;
+        const activeDreamboard = this.state.activeDreamboard!==null?<VisionboardEditor closeBoard={this.closeVisionBoard.bind(this)} edit={this.state.edit} id={this.state.activeDreamboard}/>: <div></div>;
     return (
         <div>
           <div class="row">
+            
+            <div class="col-md-4 pull-right">       
+             <NinaButton hide={this.state.activeDreamboard!==null} btnText="Create Vision Board" btnHoverText="create" btnClass="primary" onClickFn={onClickFn.bind(this)} />
+            </div>
             <div class="col-md-12">
                 <h1 class="wsg-title" >My Visionboards</h1>
             </div>
-            <div class="col-md-4 pull-right">
-                
-                    <NinaButton hide={this.state.activeDreamboard!==null} btnText="Create" 
-                    btnClass="primary" 
-                    onClickFn={onClickFn.bind(this)} />
-            </div>
-
-
           </div>
           <div class="row">
             {activeDreamboard}
-            </div>
-                                  <hr></hr>
+          </div>
+
+          <div class="row">
+            <hr></hr>
+            {this.state.visionboardPreviewList}
+          </div>
+          <hr></hr>
 
          <Modal bsSize="large" show={this.state.showCreateDreamboardModal} onHide={this.closeCreateDreamboardModal.bind(this)}>
           <Modal.Header closeButton>
+            
             <div class="text-center">
                <h1 class="wsg-title">Create a Visionboard</h1>
             </div>
           </Modal.Header>
           <Modal.Body>
+            <AlertContainer ref={a => this.msg = a} {...this.state.alertOptions} />
+
             <div class="row">
               <div class="col-md-1"></div>
               <div class="col-md-6">
@@ -174,7 +226,7 @@ export default class MyVisionboards extends React.Component {
              <div></div>
              <div></div>
              <div></div>
-              <div></div>
+             <div></div>
              <div></div>
              <div></div>
              <div></div>

@@ -11,7 +11,6 @@ export default class VisionText extends React.Component {
     const { effect } = this.props;
     const { text } = this.props;
     const { style } = this.props;
-    console.log("render vision text effect: " + effect,"text",text);
     switch(effect){
         case"ilin":{
             return <IlinText inputRef={this.props.inputRef}  text={text} style={style}/>;

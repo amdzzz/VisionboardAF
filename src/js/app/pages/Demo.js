@@ -43,9 +43,7 @@ constructor(){
 }
 
 onLayoutChange(layout){
-  console.log("on layout change");
-  console.log("layout: " + layout);
-  console.log("f" + JSON.stringify(layout));
+
 }
 
  handleClick = () => {
@@ -96,10 +94,8 @@ onLayoutChange(layout){
   }
 
   onPhotoDoubleClick(src){
-    console.log("on photo clicked ",src);
   }
   render() {
-    console.log("demo");
      var layout = [{"w":3,"h":8,"x":0,"y":2.25,"i":"b","moved":false,"static":false,"isResizable":false},
      {"w":4,"h":1.5,"x":4,"y":0,"i":"c","moved":false,"static":false,"isResizable":false},
      {"w":4,"h":2.25,"x":0,"y":10.25,"i":"d","moved":false,"static":false,"isResizable":false},
@@ -205,7 +201,7 @@ onLayoutChange(layout){
           <div class="row">
           <h1 class="wsg-title">Demo</h1>
           </div>
-            <h1 >Dreamboard Image Options</h1>
+            <h1 >Vision Board Image Options</h1>
 
               <div class="col-md-12">
                 <div class="col-md-4">

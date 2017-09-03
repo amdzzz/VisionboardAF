@@ -13,8 +13,7 @@ imgSelect(data)
 {
   if(this.props.onImageSelected)
    this.props.onImageSelected(data);
-  console.log("image clicked");
-  console.log("click count: " + this.state.clickCount);
+
   if(this.state.clickCount == 1){
     this.doubleClick();
     const clickCount = 0;
@@ -23,7 +22,6 @@ imgSelect(data)
     const clickCount = 1;
     this.setState({clickCount});
     setTimeout(function(){
-      console.log("reset click count");
       const clickCount = 0;
       this.setState({clickCount});
     }.bind(this),1000);

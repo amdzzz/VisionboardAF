@@ -17,14 +17,11 @@ export default class Layout extends React.Component {
     const containerStyle = {
       marginTop: "60px"
     };
-    const signIn = this.props.route.signIn;
-    const signOut = this.props.route.signOut;
-    const authed = this.props.route.authed;
-    const user = this.props.route.user;
+ 
     return (
       <div>
 
-        <Nav authed={this.props.route.authed} user={this.props.route.user} signIn={this.props.route.signIn.bind(this)} signOut={this.props.route.signOut.bind(this)} location={location} />
+        <Nav location={location} />
 
         <div class="container" style={containerStyle}>
           

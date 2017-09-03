@@ -2,8 +2,26 @@ import React from "react";
 import { IndexLink, Link } from "react-router";
 import { Modal, Tooltip, Popover, Button, OverlayTrigger,DropdownButton, MenuItem } from  'react-bootstrap';
 import NinaButton from '../NinaButton';
+import { connect } from 'react-redux'
+import PropTypes from 'prop-types'
+import {
+  firebaseConnect,
+  isLoaded,
+  pathToJS,
+  dataToJS // needed for full list and once
+  // orderedToJS // needed for ordered list
+  // populatedDataToJS // needed for populated list
+} from 'react-redux-firebase'
 
 
+
+var ReactGridLayout = require('react-grid-layout');
+
+@firebaseConnect([])
+@connect(({ firebase }) => ({
+  auth: pathToJS(firebase, 'auth'),
+  account: pathToJS(firebase, 'profile'),
+}))
 export default class Nav extends React.Component {
   constructor() {
     super()
@@ -14,8 +32,23 @@ export default class Nav extends React.Component {
 
   }
 
+  signIn(){
+     return this.props.firebase
+      .login({ provider: 'google', type: 'popup' })
+      .then(() => {
+        this.setState({ isLoading: false })
+        // this is where you can redirect to another route
+      })
+      .catch((error) => {
+        this.setState({ isLoading: false })
+        console.log('there was an error', error)
+        console.log('error prop:', this.props.authError) // thanks to connect
+      })
+  }
+
+
   signOut(){
-    this.props.signOut();
+    this.props.firebase.logout();
     this.close();
   }
 
@@ -25,9 +58,9 @@ export default class Nav extends React.Component {
   }
 
   loginStyle = {
-  marginTop:".5%",
-  float:"right"
-}
+      marginTop:".5%",
+      float:"right"
+    }
 
   close() {
     this.setState({ showModal: false });
@@ -40,7 +73,6 @@ export default class Nav extends React.Component {
   render() {
     const { location } = this.props;
     const { collapsed } = this.state;
-    const { signIn } = this.props;
     const demoClass = location.pathname.match(/^\/demo/) ? "active" : "";
     const aboutClass = location.pathname.match(/^\/about/) ? "active" : "";
     const contactClass = location.pathname.match(/^\/contact/) ? "active" : "";
@@ -48,20 +80,16 @@ export default class Nav extends React.Component {
 
     const navClass = collapsed ? "collapse" : "";
     //userInfo
-    var photoURL = "";
     var userName = "";
 
-    var user = this.props.user();
-    var authed = this.props.authed();
-    if(user){
-       photoURL = user.photoURL; 
-       userName = user.displayName.split(" ")[0];
+    if(this.props.account){
+       userName = this.props.account.displayName.split(" ")[0];
     }
 
      let loginBar = null;
-    if (authed) {
+    if (this.props.account) {
       loginBar =<section style={this.loginStyle} >
-        <img class="img-login-circle" src={photoURL}></img>
+        <img class="img-login-circle" src={this.props.account.avatarUrl}></img>
         <DropdownButton  bsStyle="danger" title={userName} id="bg-nested-dropdown">
               <MenuItem onSelect={this.open.bind(this)}  eventKey="">Sign Out</MenuItem>
         </DropdownButton>
@@ -73,7 +101,7 @@ export default class Nav extends React.Component {
                     btnHoverText="Login"
                     logo="fa fa-google"
                     btnClass="success"
-                    onClickFn={signIn.bind(this)} /></div>
+                    onClickFn={this.signIn.bind(this)} /></div>
                     
     }
 
