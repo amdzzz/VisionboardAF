@@ -445,7 +445,7 @@ export default class VisionboardEditor extends React.Component {
     const saveBoardButton = <NinaButton hide={!this.state.edit} onClickFn={function(){ this.setState({edit:false},function(){ this.saveBoard();}.bind(this));}.bind(this)} btnText="Save" btnHoverText="save" btnClass="success" />;
     const editButton = <NinaButton hide={this.state.edit} onClickFn={function(){this.setState({edit:true}); this.refreshBoard();}.bind(this)} btnText="Edit" btnHoverText="edit" btnClass="success" />;
     const doneButton = <NinaButton hide={this.state.edit} onClickFn={this.closeVisionBoard.bind(this)} btnText="Done" btnHoverText="done" btnClass="success" />;
-    const nothingHere = this.state.layout.length==0?<h2>To add to your vision board, click 'add photo' or 'add text'</h2>:<div></div>;
+    const nothingHere = this.state.layout.length==0?<h2>To add to your vision board, click 'edit' then 'add text' or 'add photo'</h2>:<div></div>;
     const tooltip = (
       <Tooltip id="modal-tooltip">
         Text limited to 10 characters.
@@ -458,6 +458,22 @@ export default class VisionboardEditor extends React.Component {
       <Tooltip id="modal-tooltip">
         Text limited to 30 characters.
       </Tooltip>
+    ); const popoverRight = (
+      <Popover id="popover-positioned-right" title="How To">
+        <h4 style={{color:"black"}}>1.Enter your custom text<br/> <br/>
+        2.Select the effect and background color<br/><br/>
+        3.Click add</h4>
+      </Popover>
+    ); const popoverPhoto = (
+      <Popover id="popover-positioned-right" title="How To">
+        <h4 style={{color:"black"}}>1.Select and Image<br/>
+        -Paste in a custom url and click 'load'<br/>
+        -Enter a search term in the 'Image Search' and Double click on an image to select it<br/><br/>
+         2.Select an Image Effect.<br/><br/>
+         3.Enter Primary / Secondary Text <br /><br/>
+         4.Customize Primary / Secondary Text Color <br/><br/>
+         5.Click add</h4>
+      </Popover>
     );
     return (
       <div>
@@ -492,12 +508,15 @@ export default class VisionboardEditor extends React.Component {
         <Modal bsSize="large" show={this.state.showAddTextModal} onHide={this.closeAddTextModal.bind(this)}>
           <Modal.Header closeButton>
             <div class="text-center">
-            <h1 class="wsg-title">Add Text</h1>
+            <h1 class="wsg-title">Add Text</h1>            
             </div>
           </Modal.Header>
           <Modal.Body>
            <AlertContainer ref={a => this.msg = a} {...this.state.alertOptions} />
              <div class="row">
+            <OverlayTrigger trigger="click" placement="right" overlay={popoverRight}>
+              <h3 class="pull-right marginRight2em"><i class="fa fa-info-circle"></i></h3>
+            </OverlayTrigger>
              <div class="col-md-12">
               </div>
               <div class="col-md-3">
@@ -547,7 +566,26 @@ export default class VisionboardEditor extends React.Component {
           </Modal.Header>
           <Modal.Body>
            <AlertContainer ref={a => this.msg2 = a} {...this.state.alertOptions} />
-
+            <div class="row">
+              <OverlayTrigger trigger="click" placement="right" overlay={popoverPhoto}>
+              <h3 class="pull-right marginRight2em"><i class="fa fa-info-circle"></i></h3>
+            </OverlayTrigger>
+             <div class="col-md-2">
+             </div>
+             <div class="col-md-6">
+                <YokoInput label="Custom Photo URL" value={this.state.addPhotoUrl} onChange={this.handleAddPhotoCustomUrlChange.bind(this)}/> 
+             </div>
+             <div class="col-md-2 " style={{marginTop:".8em"}}>
+               <NinaButton btnClass="primary" btnText="load" onClickFn={this.loadCustomUrl.bind(this)}/>
+            </div>
+            <div class="col-md-2">
+            </div>
+           </div>
+           <div class="row">
+             <div class="col-md-12">
+             <ImageSearch onPhotoDoubleClick={this.photoSelected.bind(this)} />
+             </div>
+           </div>
             <div class="row">
               <div class="col-md-4">
               </div>
@@ -642,23 +680,7 @@ export default class VisionboardEditor extends React.Component {
               <div class="col-md-2">
               </div>
            </div>
-           <div class="row">
-             <div class="col-md-2">
-             </div>
-             <div class="col-md-6">
-                <YokoInput label="Custom Photo URL" value={this.state.addPhotoUrl} onChange={this.handleAddPhotoCustomUrlChange.bind(this)}/> 
-             </div>
-             <div class="col-md-2 " style={{marginTop:".8em"}}>
-               <NinaButton btnClass="primary" btnText="load" onClickFn={this.loadCustomUrl.bind(this)}/>
-            </div>
-            <div class="col-md-2">
-            </div>
-           </div>
-           <div class="row">
-             <div class="col-md-12">
-             <ImageSearch onPhotoDoubleClick={this.photoSelected.bind(this)} />
-             </div>
-           </div>
+          
            
             </Modal.Body>
           <Modal.Footer>

@@ -6,7 +6,7 @@ import VisionImage from "../components/VisionImage";
 
 import axios from 'axios';
 
-import Pagination from "../components/Pagination";
+import PaginationSmall from "../components/PaginationSmall";
 
   import { ToastContainer, toast } from 'react-toastify';
 
@@ -92,12 +92,12 @@ export default class ImageSearch extends React.Component {
     return (
       <div>
         <div class="row">
-          <div class="col-md-4">
+          <div class="col-md-3">
           </div>
-          <div class="col-md-4">
+          <div class="col-md-6">
             <YokoInput value={this.state.searchValue} label={"Image Search"} onChange={this.handleChange.bind(this)} />
           </div>
-          <div class="col-md-4">
+          <div class="col-md-3">
           </div>
         </div>
         <div class="row">{DisplayPhotos}</div>
@@ -105,7 +105,7 @@ export default class ImageSearch extends React.Component {
           <div class="col-md-2">
           </div>
           <div class="col-md-8">
-          <Pagination items={this.state.photos} onChangePage={this.onChangePage}/>
+          <PaginationSmall items={this.state.photos} onChangePage={this.onChangePage}/>
           </div>
           <div class="col-md-2">
           </div>

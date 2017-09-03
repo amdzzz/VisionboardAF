@@ -4848,3 +4848,6 @@ div.cl-effect-8 a:focus {
 	transform: translateY(0px) translateX(0px);
 }
 
+.popover-title{
+	color:black;
+}
