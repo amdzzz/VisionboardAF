@@ -18,9 +18,6 @@ import {
   dataToJS 
 } from 'react-redux-firebase'
 import VisionboardPreview from '../components/VisionboardPreview';
-
-
-
 var ReactGridLayout = require('react-grid-layout');
 
 @firebaseConnect()
@@ -138,7 +135,8 @@ export default class VisionboardEditor extends React.Component {
     const x = 12;
     const y = 1200;
     const createdDate = Date.now();
-    const data = {visionboardId,text,effect,backgroundStyle,w,h,x,y,createdDate};
+    const completed = false;
+    const data = {visionboardId,text,effect,backgroundStyle,w,h,x,y,completed,createdDate};
     const update = this.getSaveUpdates();
     this.props.firebase.database().ref().update(update).then((res)=>{
       this.visionboardTextElementsDb.push(data).then((result)=>{
@@ -163,8 +161,9 @@ export default class VisionboardEditor extends React.Component {
     const h = 8;
     const x = 12;
     const y = 1200;
+    const completed = false;
     const createdDate = Date.now();
-    const data = {visionboardId,imgSrc,imgClass,primaryText,primaryTextStyle,secondaryText,secondaryTextStyle,w,h,x,y,createdDate};
+    const data = {visionboardId,imgSrc,imgClass,primaryText,primaryTextStyle,secondaryText,secondaryTextStyle,w,h,x,y,completed,createdDate};
     const update = this.getSaveUpdates();
     this.props.firebase.database().ref().update(update).then((res)=>{
        this.visionboardPhotoElementsDb.push(data).then((result)=>{
@@ -220,7 +219,7 @@ export default class VisionboardEditor extends React.Component {
       addTextText:"Text",
       addTextEffect:"kumya",
       showAddTextModal:false,
-       alertOptions : {
+      alertOptions : {
           offset: 14,
           position: 'top right',
           theme: 'light',
@@ -263,47 +262,49 @@ export default class VisionboardEditor extends React.Component {
   }
   
   createElement(el) {
-
-    var removeStyle = {
-      position: 'absolute',
-      right: '2px',
-      top: 0,
-      cursor: 'pointer',
-      color:'white',
-      fontSize:"25px",
-      textShadow: "0 0 5px black",
-      zIndex:"999"
-    };
-
-    if(!this.state.edit){
-      removeStyle = {
-      position: 'absolute',
-      right: '2px',
-      top: 0,
-      cursor: 'pointer',
-      color:'white',
-      fontSize:"25px",
-      textShadow: "0 0 5px black",
-      zIndex:"999",
-      visibility: "hidden"
-    };
-    }
-
     const i = el.i;
     const type = el.type;
+    const completed = el.completed;
+    var span = null;
+    if(!this.state.edit){
+        removeStyle = {
+            position: 'absolute',
+            right: '2px',
+            top: 0,
+            color:'green',
+            fontSize:"25px",
+            textShadow: "0 0 5px white",
+            zIndex:"999",
+        };
+        if(completed){
+            span = <span className="remove" style={removeStyle}><i class="fa fa-check-circle"></i></span>
+        }
+    
+    } else{
+      var removeStyle = {
+        position: 'absolute',
+        right: '2px',
+        top: 0,
+        cursor: 'pointer',
+        color:'white',
+        fontSize:"25px",
+        textShadow: "0 0 5px black",
+        zIndex:"999"
+      };
+       span = <span className="remove" style={removeStyle} onClick={function(){this.deleteElement(i,type);}.bind(this)}><i class="fa fa-times-circle"></i></span>
+    }
     if (type === "text"){ 
        return (
             <div key={i} data-grid={el}>
-              <span className="remove" style={removeStyle} onClick={function(){this.deleteElement(i,type);}.bind(this)}><i class="fa fa-times-circle"></i></span>
-              <VisionText key={i} style={el.backgroundStyle} text={el.text} effect={el.effect} /> 
+              {span}
+              <VisionText onDoubleClick={function(){this.markElementAsCompleted(i,type,completed);}.bind(this)} key={i} style={el.backgroundStyle} text={el.text} effect={el.effect} /> 
             </div>
           );
     }else{
        return (
           <div key={i} data-grid={el}>
-            <span className="remove" style={removeStyle} onClick={function(){this.deleteElement(i,type);}.bind(this)}><i class="fa fa-times-circle"></i></span>
-              <VisionImage key={i} primaryTextStyle={el.primaryTextStyle} secondaryTextStyle={el.secondaryTextStyle}  imgClass={el.imgClass}  title={el.primaryText} subTitle={el.secondaryText}  src={el.imgSrc}/>             
-
+            {span}
+              <VisionImage onPhotoDoubleClick={function(){this.markElementAsCompleted(i,type,completed);}.bind(this)} key={i} primaryTextStyle={el.primaryTextStyle} secondaryTextStyle={el.secondaryTextStyle}  imgClass={el.imgClass}  title={el.primaryText} subTitle={el.secondaryText}  src={el.imgSrc}/>             
           </div>
           );
     }
@@ -323,6 +324,35 @@ export default class VisionboardEditor extends React.Component {
         }
     });
    
+  }
+
+  markElementAsCompleted(elementId,type,completed){
+    if(!this.state.edit){
+    const update = {};
+    switch(type){
+      case "text":{
+        update['/visiontext/'+elementId+"/completed"]=!completed;
+        break;        
+      }
+      case "photo":{
+        update['/visionphoto/'+elementId+"/completed"]=!completed;   
+        break;     
+      }
+    }
+    this.props.firebase.database().ref().update(update).then((result)=>{
+      this.refreshBoard();
+      this.mainMsg.show('Succsfully updated board', {
+        time: 3000,
+        icon: <i style={{color:"green",fontSize:"2em"}} class="fa fa-check-circle font25"></i>
+      });    
+    }).catch((error)=>{
+      console.log("error saving visionboard");
+      this.mainMsg.show('Error saving board', {
+      time: 3000,
+      icon: <i style={{color:"green",fontSize:"2em"}} class="fa fa-exclamation-circle font25"></i>
+     });
+    });
+  }
   }
 
   setUpVisionboard(){
@@ -374,8 +404,9 @@ export default class VisionboardEditor extends React.Component {
     const text = element.child("text").val();
     const effect = element.child("effect").val();
     const backgroundStyle = element.child("backgroundStyle").val();
+    const completed = element.child("completed").val();
     const type= "text";
-    const el = {w,h,x,y,i,isResizable,isDraggable,type,text,effect,backgroundStyle};
+    const el = {w,h,x,y,i,isResizable,isDraggable,type,text,effect,backgroundStyle,completed};
     return el;
   }
 
@@ -395,8 +426,9 @@ export default class VisionboardEditor extends React.Component {
     const secondaryTextStyle = element.child("secondaryTextStyle").val();
     const imgClass = element.child("imgClass").val();
     const imgSrc = element.child("imgSrc").val();
+    const completed = element.child("completed").val();
     const type= "photo";
-    const el = {w,h,x,y,i,isResizable,isDraggable,type,primaryText,secondaryText,primaryTextStyle,secondaryTextStyle,imgClass,imgSrc};
+    const el = {w,h,x,y,i,isResizable,isDraggable,type,primaryText,secondaryText,primaryTextStyle,secondaryTextStyle,imgClass,imgSrc,completed};
     return el;
   }
 
@@ -442,8 +474,9 @@ export default class VisionboardEditor extends React.Component {
     const title = this.state.title;
     const addTextButton = <div class="pull-right"><NinaButton hide={!this.state.edit} onClickFn={this.openAddTextModal.bind(this)} btnText="Add Text" btnHoverText="add" btnClass="primary" /></div>;
     const addPhotoButton = <NinaButton hide={!this.state.edit} onClickFn={this.openAddPhotoModal.bind(this)} btnText="Add Photo" btnHoverText="add" btnClass="primary" />;
-    const saveBoardButton = <NinaButton hide={!this.state.edit} onClickFn={function(){ this.setState({edit:false},function(){ this.saveBoard();}.bind(this));}.bind(this)} btnText="Save" btnHoverText="save" btnClass="success" />;
-    const editButton = <NinaButton hide={this.state.edit} onClickFn={function(){this.setState({edit:true}); this.refreshBoard();}.bind(this)} btnText="Edit" btnHoverText="edit" btnClass="success" />;
+    const deleteButton = <NinaButton hide={!this.state.edit} onClickFn={this.props.deleteVisionBoard} btnText="Delete" btnHoverText="delete" btnClass="danger" />;
+    const saveBoardButton = <NinaButton hide={!this.state.edit} onClickFn={function(){ this.setState({edit:false},function(){ this.saveBoard();}.bind(this));}.bind(this)} btnText="Save" btnHoverText="save" btnClass="success" />;    
+    const editButton = <NinaButton hide={this.state.edit} onClickFn={function(){this.setState({edit:true}); this.refreshBoard();}.bind(this)} btnText="Edit" btnHoverText="edit" btnClass="primary" />;
     const doneButton = <NinaButton hide={this.state.edit} onClickFn={this.closeVisionBoard.bind(this)} btnText="Done" btnHoverText="done" btnClass="success" />;
     const nothingHere = this.state.layout.length==0?<h2>To add to your vision board, click 'edit' then 'add text' or 'add photo'</h2>:<div></div>;
     const tooltip = (
@@ -458,41 +491,56 @@ export default class VisionboardEditor extends React.Component {
       <Tooltip id="modal-tooltip">
         Text limited to 30 characters.
       </Tooltip>
-    ); const popoverRight = (
-      <Popover id="popover-positioned-right" title="How To">
+    ); const popoverText = (
+      <Popover id="popover-positioned-right" title="How To Add Text To Your Vision Board">
         <h4 style={{color:"black"}}>1.Enter your custom text<br/> <br/>
         2.Select the effect and background color<br/><br/>
-        3.Click add</h4>
+        3.Click 'Add'</h4>
       </Popover>
     ); const popoverPhoto = (
-      <Popover id="popover-positioned-right" title="How To">
-        <h4 style={{color:"black"}}>1.Select and Image<br/>
+      <Popover id="popover-positioned-right" title="How To Add A Photo To Your Vision Board">
+        <h4 style={{color:"black"}}>1.Select an Image<br/>
         -Paste in a custom url and click 'load'<br/>
         -Enter a search term in the 'Image Search' and Double click on an image to select it<br/><br/>
          2.Select an Image Effect.<br/><br/>
          3.Enter Primary / Secondary Text <br /><br/>
          4.Customize Primary / Secondary Text Color <br/><br/>
-         5.Click add</h4>
+         5.Click 'Add'</h4>
       </Popover>
+      
     );
+    const popoverVisionboardComplete = (
+      <Popover id="popover-positioned-right" title="">
+        <h4 style={{color:"black"}}>
+        Double click on a text or photo element to mark it as completed</h4>
+      </Popover>
+    ); 
+    
+    
+    const overlay = !this.state.edit?<OverlayTrigger trigger="click" placement="right" overlay={popoverVisionboardComplete}>
+    <h3 class="pull-left marginLeft1em"><i class="fa fa-info-circle"></i></h3>
+  </OverlayTrigger>: <div></div>;
     return (
       <div>
         <div class="row">
         <AlertContainer ref={a => this.mainMsg = a} {...this.state.alertOptions} />
 
-          <div class="col-md-6">
-            <h1 class="pull-left">{this.state.visionboardTitle}</h1>
+          <div class="col-md-4">
+            <h1 class="pull-left">{this.state.visionboardTitle}</h1>{overlay}
           </div>
           <div class="col-md-2">
                {addTextButton}
           </div> 
           <div class="col-md-2">
                {addPhotoButton}
-               {editButton}
           </div>
           <div class="col-md-2">
+              {editButton}
                {saveBoardButton}
-               {doneButton}
+          </div> 
+          <div class="col-md-2">
+            {doneButton}
+            {deleteButton}
           </div>          
         </div>
         <div class="row marginBottom2em">
@@ -514,7 +562,7 @@ export default class VisionboardEditor extends React.Component {
           <Modal.Body>
            <AlertContainer ref={a => this.msg = a} {...this.state.alertOptions} />
              <div class="row">
-            <OverlayTrigger trigger="click" placement="right" overlay={popoverRight}>
+            <OverlayTrigger trigger="click" placement="right" overlay={popoverText}>
               <h3 class="pull-right marginRight2em"><i class="fa fa-info-circle"></i></h3>
             </OverlayTrigger>
              <div class="col-md-12">

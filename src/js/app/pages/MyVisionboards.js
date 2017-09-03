@@ -31,6 +31,7 @@ export default class MyVisionboards extends React.Component {
   constructor(){
     super();
     this.state={
+      showDeleteModal: false,
       showCreateDreamboardModal: false, 
       createDreamboardTitle:"",
       createDreamboardBGStyle:{background: "#1e2021"},
@@ -59,7 +60,7 @@ export default class MyVisionboards extends React.Component {
             const id = snapshot.key;
             const title = snapshot.child("title").val();
             var visionboardPreviewList = this.state.visionboardPreviewList;
-            visionboardPreviewList.push(<div class="col-md-4"><VisionboardPreview key={id} onClick={()=>{this.setActiveVisionboard(id)}} id={id} title={title} /></div>)
+            visionboardPreviewList.push(<div key={Date.now()} class="col-md-4"><VisionboardPreview key={id} onClick={()=>{this.setActiveVisionboard(id)}} id={id} title={title} /></div>)
             this.setState({visionboardPreviewList});
          }.bind(this));
           const vbSet = true;
@@ -69,15 +70,15 @@ export default class MyVisionboards extends React.Component {
 
   componentDidMount(){
     if(this.props.firebase && this.props.auth && !this.state.vbSet){
-       var vbs = this.props.firebase.database().ref("visionboards");
-      vbs.orderByChild("uid").equalTo(this.props.auth.uid)
-        .on("child_added", function(snapshot) {
+       var vbs = this.props.firebase.database().ref("visionboards").orderByChild("uid").equalTo(this.props.auth.uid);
+        vbs.on("child_added", function(snapshot) {
             const id = snapshot.key;
             const title = snapshot.child("title").val();
             var visionboardPreviewList = this.state.visionboardPreviewList;
-            visionboardPreviewList.push(<div class="col-md-4"><VisionboardPreview key={id} onClick={()=>{this.setActiveVisionboard(id)}} id={id} title={title} /></div>)
+            visionboardPreviewList.push(<div key={id} class="col-md-4"><VisionboardPreview key={id} onClick={()=>{this.setActiveVisionboard(id)}} id={id} title={title} /></div>)
             this.setState({visionboardPreviewList});
          }.bind(this));
+       
           const vbSet = true;
           this.setState({vbSet});
     }
@@ -117,6 +118,16 @@ export default class MyVisionboards extends React.Component {
     
   }
 
+    
+  closeDeleteModal() {
+    this.setState({showDeleteModal: false});
+  }
+
+  showDeleteModal() {
+    this.setState({ showDeleteModal: true });
+    
+  }
+
   createDreamboard(){
     if(this.state.createDreamboardTitle.length<2){
       this.msg.show('title must have at least 2 chracters', {
@@ -147,6 +158,12 @@ export default class MyVisionboards extends React.Component {
      return this.props.firebase.database().ref("visionboards").push(data);   
   }
 
+  deleteVisionBoard(){
+      console.log("delete",this.state.activeDreamboard);
+      this.props.firebase.database().ref("/visionboards/"+this.state.activeDreamboard).remove();  
+      window.location.reload();    
+  }
+
   
 
   showEditDreamboardPage(demo){
@@ -155,7 +172,15 @@ export default class MyVisionboards extends React.Component {
 
   render() {    
     const layout=[];
-    const onClickFn = this.openCreateDreamboardModal.bind(this);   
+    const onClickFn = this.openCreateDreamboardModal.bind(this);  
+    const popoverVisionboard = (
+      <Popover id="popover-positioned-right" title="How To Create Your Vision Board">
+        <h4 style={{color:"black"}}>1.Enter the name for your vision board<br/> <br/>
+        2.Select the background and border color<br/><br/>
+        3.Click 'Create'</h4>
+      </Popover>
+    ); 
+    
     if(!this.props.account){
        return (
         <div>
@@ -170,8 +195,11 @@ export default class MyVisionboards extends React.Component {
         </div>
       );
     }else{
-        const activeDreamboard = this.state.activeDreamboard!==null?<VisionboardEditor closeBoard={this.closeVisionBoard.bind(this)} edit={this.state.edit} id={this.state.activeDreamboard}/>: <div></div>;
-    return (
+      const activeDreamboard = this.state.activeDreamboard!==null?<VisionboardEditor deleteVisionBoard={this.showDeleteModal.bind(this)} closeBoard={this.closeVisionBoard.bind(this)} edit={this.state.edit} id={this.state.activeDreamboard}/>: <div></div>;
+    
+      
+        
+        return (
         <div>
           <div class="row">
             
@@ -203,6 +231,9 @@ export default class MyVisionboards extends React.Component {
             <AlertContainer ref={a => this.msg = a} {...this.state.alertOptions} />
 
             <div class="row">
+            <OverlayTrigger trigger="click" placement="right" overlay={popoverVisionboard}>
+              <h3 class="pull-right marginRight2em"><i class="fa fa-info-circle"></i></h3>
+            </OverlayTrigger>
               <div class="col-md-1"></div>
               <div class="col-md-6">
                 <YokoInput label="Title" value={this.state.createDreamboardTitle} onChange={this.handleDreamboardTitleChange.bind(this)}/>
@@ -239,7 +270,17 @@ export default class MyVisionboards extends React.Component {
             <Button  onClick={this.closeCreateDreamboardModal.bind(this)}>Close</Button>
           </Modal.Footer>
         </Modal>
-
+        
+        <Modal show={this.state.showDeleteModal} onHide={this.closeDeleteModal.bind(this)}>
+ 
+          <Modal.Body>
+            <p>Do you want to delete this vision board?</p>
+            </Modal.Body>
+          <Modal.Footer>
+            <Button bsStyle="danger" onClick={this.deleteVisionBoard.bind(this)}>Delete</Button>
+            <Button  onClick={this.closeDeleteModal.bind(this)}>Close</Button>
+          </Modal.Footer>
+        </Modal>
        
         </div>
       );

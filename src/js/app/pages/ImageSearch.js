@@ -104,10 +104,10 @@ export default class ImageSearch extends React.Component {
         <div class="row">
           <div class="col-md-2">
           </div>
-          <div class="col-md-8">
+          <div class="col-md-9">
           <PaginationSmall items={this.state.photos} onChangePage={this.onChangePage}/>
           </div>
-          <div class="col-md-2">
+          <div class="col-md-1">
           </div>
         </div>
       </div>

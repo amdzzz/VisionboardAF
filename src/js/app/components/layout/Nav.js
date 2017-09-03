@@ -37,7 +37,7 @@ export default class Nav extends React.Component {
       .login({ provider: 'google', type: 'popup' })
       .then(() => {
         this.setState({ isLoading: false })
-        // this is where you can redirect to another route
+        window.location.reload();
       })
       .catch((error) => {
         this.setState({ isLoading: false })
@@ -149,7 +149,7 @@ export default class Nav extends React.Component {
          
       </nav>
 
-<Modal show={this.state.showModal} onHide={this.close.bind(this)}>
+        <Modal show={this.state.showModal} onHide={this.close.bind(this)}>
  
           <Modal.Body>
             <p>Do you want to sign out? Any unsaved data will be LOST!</p>

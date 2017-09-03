@@ -4681,6 +4681,10 @@ text-shadow: 1.5px 1.5px 6px #000000;	font-weight: bolder;
 	border: 3px solid #FFFFFF;
 }
 
+.button--nina-danger:hover {
+	background-color: #FF6666;
+	border: 3px solid #FFFFFF;
+}
 
 .button--nina:hover::before {
 	opacity: 0;
@@ -4763,7 +4767,7 @@ text-shadow: 1.5px 1.5px 6px #000000;	font-weight: bolder;
 }
 
 .width1200{
-	width:1250px;
+	width:1210px;
 	border-radius: 3px;
 }
 
@@ -4775,6 +4779,9 @@ text-shadow: 1.5px 1.5px 6px #000000;	font-weight: bolder;
 }
 .marginRight2em{
 	margin-right: 2em;
+}
+.marginLeft1em{
+	margin-left: 1em;
 }
 
 @media only screen and (max-width: 890px) {

@@ -28,7 +28,8 @@ imgSelect(data)
 }
 
   doubleClick(src){
-    this.props.onPhotoDoubleClick(src);
+    if(this.props.onPhotoDoubleClick)
+       this.props.onPhotoDoubleClick(src);
   }
 
   render() {

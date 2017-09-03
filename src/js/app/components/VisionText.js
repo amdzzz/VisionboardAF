@@ -11,18 +11,19 @@ export default class VisionText extends React.Component {
     const { effect } = this.props;
     const { text } = this.props;
     const { style } = this.props;
+    const { onDoubleClick } = this.props;
     switch(effect){
         case"ilin":{
-            return <IlinText inputRef={this.props.inputRef}  text={text} style={style}/>;
+            return <IlinText onDoubleClick={onDoubleClick} inputRef={this.props.inputRef}  text={text} style={style}/>;
         }
         case"kukuri":{
-            return <KukuriText inputRef={this.props.inputRef} text={text} style={style}/>;
+            return <KukuriText onDoubleClick={onDoubleClick} inputRef={this.props.inputRef} text={text} style={style}/>;
         }
         case"kumya":{
-            return <KumyaText inputRef={this.props.inputRef} text={text} style={style}/>;
+            return <KumyaText onDoubleClick={onDoubleClick} inputRef={this.props.inputRef} text={text} style={style}/>;
         }
         case"nukun":{
-            return <NukunText inputRef={this.props.inputRef} text={text} style={style}/>;
+            return <NukunText onDoubleClick={onDoubleClick} inputRef={this.props.inputRef} text={text} style={style}/>;
         }
         default:{
             return<div></div>
