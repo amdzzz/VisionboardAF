@@ -126,6 +126,17 @@ export default class VisionboardEditor extends React.Component {
     this.setState({ showAddPhotoModal: true});
   }
   addTextToBoard(){
+    // console.log("auth",this.props.auth);
+    // this.props.firebase.auth().currentUser.getToken(/* forceRefresh */ true).then(function(idToken) {
+    //   console.log("token for https,",idToken);
+    //   console.log("yd",this.props.auth.Yd)
+    //   if(idToken===this.props.auth.Yd){
+    //     console.log("equals ");
+    //   }
+    // }.bind(this)).catch(function(error) {
+    //   console.log("error");
+    // });
+    const uid = this.props.auth.uid;
     const visionboardId = this.props.id;
     const text = this.state.addTextText;
     const effect = this.state.addTextEffect;
@@ -133,10 +144,10 @@ export default class VisionboardEditor extends React.Component {
     var w = Math.abs((Math.round((this.inputElement.clientWidth+35)/100 * 2) / 2).toFixed(1));
     const h = (this.inputElement.clientHeight/35);
     const x = 12;
-    const y = 1200;
+    const y = 3;
     const createdDate = Date.now();
     const completed = false;
-    const data = {visionboardId,text,effect,backgroundStyle,w,h,x,y,completed,createdDate};
+    const data = {uid,visionboardId,text,effect,backgroundStyle,w,h,x,y,completed,createdDate};
     const update = this.getSaveUpdates();
     this.props.firebase.database().ref().update(update).then((res)=>{
       this.visionboardTextElementsDb.push(data).then((result)=>{
@@ -150,6 +161,13 @@ export default class VisionboardEditor extends React.Component {
   }
 
   addPhotoToBoard(){
+    // console.log("auth",this.props.auth);
+    // this.props.firebase.auth().currentUser.getToken(/* forceRefresh */ true).then(function(idToken) {
+    //   console.log("token for https,",idToken);
+    // }).catch(function(error) {
+    //   console.log("error");
+    // });
+    const uid = this.props.auth.uid;    
     const visionboardId = this.props.id;
     const primaryText = this.state.addPhotoPrimaryText;
     const primaryTextStyle = this.state.addPhotoPrimaryTextStyle;
@@ -160,10 +178,10 @@ export default class VisionboardEditor extends React.Component {
     const w = 3;
     const h = 8;
     const x = 12;
-    const y = 1200;
+    const y = 3;
     const completed = false;
     const createdDate = Date.now();
-    const data = {visionboardId,imgSrc,imgClass,primaryText,primaryTextStyle,secondaryText,secondaryTextStyle,w,h,x,y,completed,createdDate};
+    const data = {uid,visionboardId,imgSrc,imgClass,primaryText,primaryTextStyle,secondaryText,secondaryTextStyle,w,h,x,y,completed,createdDate};
     const update = this.getSaveUpdates();
     this.props.firebase.database().ref().update(update).then((res)=>{
        this.visionboardPhotoElementsDb.push(data).then((result)=>{
@@ -546,7 +564,7 @@ export default class VisionboardEditor extends React.Component {
         <div class="row marginBottom2em">
           <div class="width1200" style={this.state.visionboardBackgroundStyle}>
             <div class="width1200" style={this.state.visionboardBorderStyle}>
-              <ReactGridLayout onLayoutChange={this.onLayoutChange.bind(this)} className="layout" layout={this.state.layout} cols={12} rowHeight={30} width={1200}>
+              <ReactGridLayout verticalCompact={false} onLayoutChange={this.onLayoutChange.bind(this)} className="layout" layout={this.state.layout} cols={12} rowHeight={30} width={1200}>
                 {_.map(this.state.layout, this.createElement.bind(this))}
               </ReactGridLayout>
             </div>

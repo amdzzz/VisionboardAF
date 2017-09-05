@@ -75,7 +75,7 @@ export default class ImageSearch extends React.Component {
     const photoSearchFilled = this.state.searchValue.length>0;
     const photoSearchInputClass = photoSearchFilled? " input--filled":"";
     
- const DisplayPhotos = this.state.displayPhotos.map((photo, i) =><div class="col-md-4"> <VisionImage onPhotoDoubleClick={this.props.onPhotoDoubleClick}  imgClass="effect-apollo" key={photo.id} onImageSelected={this.onImageSelected.bind(this)} title={photo.title} subTitle="Add this image" src={'https://farm'+photo.farm+'.staticflickr.com/'+photo.server+'/'+photo.id+'_'+photo.secret+'_'+'c.jpg'}/> </div>);        
+ const DisplayPhotos = this.state.displayPhotos.map((photo, i) =><div class="col-md-4"> <VisionImage onPhotoDoubleClick={this.props.onPhotoDoubleClick}  imgClass="effect-apollo" key={photo.id} onImageSelected={this.onImageSelected.bind(this)} title={photo.title} subTitle="Double click to add this image" src={'https://farm'+photo.farm+'.staticflickr.com/'+photo.server+'/'+photo.id+'_'+photo.secret+'_'+'c.jpg'}/> </div>);        
     if(DisplayPhotos.length<0){
         return(
             <div>
