@@ -160,7 +160,12 @@ export default class MyVisionboards extends React.Component {
 
   deleteVisionBoard(){
       console.log("delete",this.state.activeDreamboard);
-      this.props.firebase.database().ref("/visionboards/"+this.state.activeDreamboard).remove();  
+      this.props.firebase.database().ref("/visionboards/"+this.state.activeDreamboard).remove();
+     console.log("del text");
+      this.props.firebase.database().ref("/visiontext").orderByChild("visionboardId").equalTo(this.state.activeDreamboard).remove();
+      console.log("del photot");
+      
+      this.props.firebase.database().ref("/visionphoto").orderByChild("visionboardId").equalTo(this.state.activeDreamboard).remove();      
       window.location.reload();    
   }
 
@@ -175,9 +180,10 @@ export default class MyVisionboards extends React.Component {
     const onClickFn = this.openCreateDreamboardModal.bind(this);  
     const popoverVisionboard = (
       <Popover id="popover-positioned-right" title="How To Create Your Vision Board">
-        <h4 style={{color:"black"}}>1.Enter the name for your vision board<br/> <br/>
-        2.Select the background and border color<br/><br/>
-        3.Click 'Create'</h4>
+        <h4 style={{color:"black"}}>
+          1.Enter the name for your vision board<br/> <br/>
+          2.Select the background and border color<br/><br/>
+          3.Click 'Create'</h4>
       </Popover>
     ); 
     
@@ -188,7 +194,7 @@ export default class MyVisionboards extends React.Component {
             <div class="col-md-12">
                 <h1 class="wsg-title" >My Visionboards</h1>
                 <h1> Please log in with google to create or view your Visionboards.</h1>
-                <h1> See our Demo for more info on what you can create.</h1>
+                <h1> See the Demo for more info on what you can create.</h1>
             </div>
           </div>
           <hr></hr>
